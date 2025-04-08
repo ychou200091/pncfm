@@ -40,7 +40,7 @@ file_list = {
     "2_4.csv": {"name": "Flow B", "start_time": 25},
     "9_10.csv": {"name": "Flow C", "start_time": 100},
     "5_6.csv": {"name": "Flow D", "start_time": 130}
-}
+} 
 
 def load_and_align_data():
     all_data = []

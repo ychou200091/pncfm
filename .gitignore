@@ -1,0 +1,10 @@
+/code/6633
+/code/6634
+/code/6635
+/sample
+/ryu
+/OVS281_modify
+
+# git rm --cached OVS281_modify -r
+# git rm --cached /sample -r
+# git rm --cached /ryu -r
