@@ -1,0 +1,71 @@
+------------------------------------------------------------
+Client connecting to 10.0.0.6, UDP port 5001 with pid 4613
+Sending 1470 byte datagrams, IPG target: 1869.20 us (kalman adjust)
+UDP buffer size:  208 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.0.5 port 36155 connected with 10.0.0.6 port 5001
+[ ID] Interval            Transfer     Bandwidth      Write/Err  PPS
+[  3] 0.0000-5.0000 sec  3.75 MBytes  6.29 Mbits/sec  2676/0      535 pps
+[  3] 5.0000-10.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 10.0000-15.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 15.0000-20.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 20.0000-25.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 25.0000-30.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 30.0000-35.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 35.0000-40.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 40.0000-45.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 45.0000-50.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 50.0000-55.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 55.0000-60.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 60.0000-65.0000 sec  3.75 MBytes  6.29 Mbits/sec  2674/0      535 pps
+[  3] 65.0000-70.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 70.0000-75.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 75.0000-80.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 80.0000-85.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 85.0000-90.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 90.0000-95.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 95.0000-100.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 100.0000-105.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 105.0000-110.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 110.0000-115.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 115.0000-120.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 120.0000-125.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 125.0000-130.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 130.0000-135.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 135.0000-140.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 140.0000-145.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 145.0000-150.0000 sec  3.75 MBytes  6.29 Mbits/sec  2674/0      535 pps
+[  3] 150.0000-155.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 155.0000-160.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 160.0000-165.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 165.0000-170.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 170.0000-175.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 175.0000-180.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 180.0000-185.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 185.0000-190.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 190.0000-195.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 195.0000-200.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 200.0000-205.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 205.0000-210.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 210.0000-215.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 215.0000-220.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 220.0000-225.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 225.0000-230.0000 sec  3.75 MBytes  6.29 Mbits/sec  2674/0      535 pps
+[  3] 230.0000-235.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 235.0000-240.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 240.0000-245.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 245.0000-250.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 250.0000-255.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 255.0000-260.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 260.0000-265.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 265.0000-270.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 270.0000-275.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 275.0000-280.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 280.0000-285.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 285.0000-290.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 290.0000-295.0000 sec  3.75 MBytes  6.29 Mbits/sec  2675/0      535 pps
+[  3] 0.0000-300.0017 sec   225 MBytes  6.29 Mbits/sec  160497/0      534 pps
+[  3] Sent 160497 datagrams
+[  3] Server Report:
+[  3] 0.0000-299.9552 sec   212 MBytes  5.92 Mbits/sec   0.191 ms 9583/160497 (6%) 216.178/ 0.108/673.545/ 0.157 ms  535 pps  3.42
+[  3] 0.0000-299.9552 sec  154 datagrams received out-of-order

@@ -1,0 +1,110 @@
+qdisc noqueue 0: dev lo root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc fq_codel 0: dev ens33 root refcnt 2 limit 10240p flows 1024 quantum 1514 target 5.0ms interval 100.0ms memory_limit 32Mb ecn 
+ Sent 1229701 bytes 13696 pkt (dropped 0, overlimits 0 requeues 1) 
+ backlog 0b 0p requeues 1
+  maxpacket 3028 drop_overlimit 0 new_flow_count 21 ecn_mark 0
+  new_flows_len 0 old_flows_len 0
+qdisc tbf 5: dev s2-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s1-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s3-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s1-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s3-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s2-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 3051 bytes 26 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s4-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s2-eth3 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s6-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2926 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s5-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s7-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s5-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s8-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s7-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s8-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s6-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s10-eth1 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s9-eth1 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s11-eth1 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s9-eth2 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s11-eth2 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s10-eth2 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s12-eth1 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s10-eth3 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s12-eth2 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc noqueue 0: dev s11-eth3 root refcnt 2 
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s13-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s1-eth3 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s7-eth3 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s13-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 3074 bytes 26 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s14-eth1 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s4-eth4 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2981 bytes 25 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s8-eth5 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 2891 bytes 24 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+qdisc tbf 5: dev s14-eth2 root refcnt 129 rate 10Mbit burst 15000b lat 12.0ms 
+ Sent 3095 bytes 26 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0

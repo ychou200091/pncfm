@@ -1,0 +1,27 @@
+------------------------------------------------------------
+Client connecting to 10.0.0.2, UDP port 5001 with pid 17415
+Sending 1470 byte datagrams, IPG target: 1470.00 us (kalman adjust)
+UDP buffer size:  208 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.0.4 port 33038 connected with 10.0.0.2 port 5001
+[ ID] Interval       Transfer     Bandwidth      PPS
+[  3] 0.00-5.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 5.00-10.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 10.00-15.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 15.00-20.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 20.00-25.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 25.00-30.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 30.00-35.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 35.00-40.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 40.00-45.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 45.00-50.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 50.00-55.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 55.00-60.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 60.00-65.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 65.00-70.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 70.00-75.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 75.00-80.00 sec  4.76 MBytes  7.98 Mbits/sec  678 pps
+[  3] 80.00-85.00 sec  4.78 MBytes  8.02 Mbits/sec  682 pps
+[  3] 85.00-90.00 sec  4.77 MBytes  8.00 Mbits/sec  680 pps
+[  3] 0.00-90.00 sec  85.8 MBytes  8.00 Mbits/sec  680 pps
+[  3] Sent 61226 datagrams

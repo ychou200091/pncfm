@@ -1,0 +1,4 @@
+awk -f avgStats.awk  1.out > avgTCP1.out
+awk -f avgStats.awk  2.out > avgTCP2.out
+awk -f avgStats.awk  5.out > avgTCP5.out
+awk -f avgStats.awk  9.out > avgTCP9.out
