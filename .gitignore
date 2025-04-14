@@ -4,7 +4,18 @@
 /sample
 /ryu
 /OVS281_modify
-
+/code
+/codeM/log/CHFM/
+/codeM/log/CFM/
+/codeM/log/CHFM_org/
+/codeM/log/CFM_org/
+/codeM/log/client1_3.out
+/codeM/log/client2_4.out
+/codeM/log/client5_6.out
+/codeM/log/client9_10.out
+/codeM/ringtone.mp3
+/codeM/ringtone.wav
+/codeM/temp.py
 # git rm --cached OVS281_modify -r
 # git rm --cached /sample -r
 # git rm --cached /ryu -r

@@ -40,9 +40,7 @@ from ryu.lib.packet import ether_types
 from ryu.lib.packet import  in_proto as inet
 
 CONF = cfg.CONF
-ip_domain={'10.0.0.1':1,'10.0.0.2':1,'10.0.0.3':1,'10.0.0.4':1,
-           '10.0.0.5':2,'10.0.0.6':2,'10.0.0.7':3,'10.0.0.8':3,
-           '10.0.0.9':2,'10.0.0.10':2}
+ip_domain={'10.0.0.1':1,'10.0.0.2':1,'10.0.0.3':1,'10.0.0.4':1,'10.0.0.5':2,'10.0.0.6':2,'10.0.0.7':3,'10.0.0.8':3,'10.0.0.9':2,'10.0.0.10':2}
 switch_domain={6633:1,6634:2,6635:3}
 
 class NetworkAwareness(app_manager.RyuApp):
@@ -70,7 +68,7 @@ class NetworkAwareness(app_manager.RyuApp):
         self.pre_access_table = {}
         self.pre_link_to_port = {}
         self.shortest_paths = None
-        self.monitor = lookup_service_brick('monitor')
+	self.monitor = lookup_service_brick('monitor')
         # Start a green thread to discover network resource.
         self.discover_thread = hub.spawn(self._discover)
 
@@ -94,18 +92,111 @@ class NetworkAwareness(app_manager.RyuApp):
         parser = datapath.ofproto_parser
         msg = ev.msg
         self.logger.info("switch:%s connected", datapath.id)
+
         # install table-miss flow entry
         match = parser.OFPMatch()
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
                                           ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
-        #if datapath.id==1 or datapath.id==3:
-        for i in range(1,11):
-            #req=parser.OFPMeterMod(datapath=datapath, command=ofproto.OFPMC_DELETE,meter_id=i)
-            #datapath.send_msg(req)
-            bands = [parser.OFPMeterBandDrop(type_=ofproto.OFPMBT_DROP,rate=i*1024)]
-            req=parser.OFPMeterMod(datapath=datapath, command=ofproto.OFPMC_ADD, flags=ofproto.OFPMF_KBPS, meter_id=i, bands=bands)
-            datapath.send_msg(req)
+	#print datapath.id
+	
+	if datapath.id==7:
+	    kwargs = dict(in_port=3, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.1', ipv4_dst='10.0.0.3')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 3
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(2)])
+
+
+	    kwargs = dict(in_port=2, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.3', ipv4_dst='10.0.0.1')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 2
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(3)])
+
+	    kwargs = dict(in_port=3, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.2', ipv4_dst='10.0.0.4')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 3
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(2)])
+
+
+	    kwargs = dict(in_port=2, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.4', ipv4_dst='10.0.0.2')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 2
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(3)])
+
+            
+	if datapath.id==14:
+	    kwargs = dict(in_port=2, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.1', ipv4_dst='10.0.0.3')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 2
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(1)])
+
+	    kwargs = dict(in_port=1, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.3', ipv4_dst='10.0.0.1')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 1
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(2)])
+
+
+	    kwargs = dict(in_port=2, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.2', ipv4_dst='10.0.0.4')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 2
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(1)])
+
+
+	    kwargs = dict(in_port=1, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.4', ipv4_dst='10.0.0.2')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 1
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(2)])
+        if datapath.id==8:
+	    kwargs = dict(in_port=2, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.1', ipv4_dst='10.0.0.3')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 2
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(5)])
+
+	    kwargs = dict(in_port=5, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.3', ipv4_dst='10.0.0.1')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 5
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(2)])
+
+
+	    kwargs = dict(in_port=2, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.2', ipv4_dst='10.0.0.4')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 2
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(5)])
+
+
+	    kwargs = dict(in_port=5, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.4', ipv4_dst='10.0.0.2')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 5
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(2)])
+	
+       
+	'''
+	if datapath.id==4:
+	    kwargs = dict(in_port=4, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.2', ipv4_dst='10.0.0.4')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 4
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(6)])
+
+	    kwargs = dict(in_port=6, eth_type=ether_types.ETH_TYPE_IP,ipv4_src='10.0.0.4', ipv4_dst='10.0.0.2')
+            match1 = parser.OFPMatch(**kwargs)
+            kwargs['in_port'] = 6
+            match2 = parser.OFPMatch(**kwargs)
+            self.add_flow(datapath, 1, match= match2, actions= [parser.OFPActionOutput(4)])
+	'''
+
 
 
     def add_flow(self, dp, p, match, actions, idle_timeout=0, hard_timeout=0):
@@ -212,7 +303,6 @@ class NetworkAwareness(app_manager.RyuApp):
         """
         generator = nx.shortest_simple_paths(graph, source=src,
                                              target=dst, weight=weight)
-        #print "weight: ",weight
         shortest_paths = []
         try:
             for path in generator:
@@ -233,17 +323,12 @@ class NetworkAwareness(app_manager.RyuApp):
 
         # Find ksp in graph.
         for src in _graph.nodes():
-            #paths.setdefault(src, {src: [[src] for i in xrange(k)]})
-            paths.setdefault(src, {src: {'hop':[[src]]}})
-            #paths.setdefault(src,{})
-            #paths[src].setdefault(src,{})
-            #paths[src][src]['hop']=[src]
-            #print paths
+            paths.setdefault(src, {src: [[src] for i in xrange(k)]})
             for dst in _graph.nodes():
                 if src == dst:
                     continue
-                paths[src].setdefault(dst, {})
-                paths[src][dst]['hop'] = self.k_shortest_paths(_graph, src, dst,
+                paths[src].setdefault(dst, [])
+                paths[src][dst] = self.k_shortest_paths(_graph, src, dst,
                                                         weight=weight, k=k)
         return paths
 
@@ -267,10 +352,8 @@ class NetworkAwareness(app_manager.RyuApp):
         self.get_graph(self.link_to_port.keys())
         self.shortest_paths = self.all_k_shortest_paths(
             self.graph, weight='weight', k=CONF.k_paths)
-        #print "shortest_paths :",self.shortest_paths
-        #self.shortest_pathss = self.all_k_shortest_paths(
-        #    self.graph, weight='delay', k=CONF.k_paths)
-        #print "shortest_pathss :",self.shortest_pathss
+
+
     def register_access_info(self, dpid, in_port, ip, mac):
         """
             Register access host info into access table.
@@ -280,13 +363,11 @@ class NetworkAwareness(app_manager.RyuApp):
 
         if (ip, mac) in self.access_table:
             if self.access_table[(ip, mac)] == (dpid, in_port):
-                #print "access_table :",self.access_table
-                return
+                    return
           
         else:
             self.access_table.setdefault((ip, mac), None)
             self.access_table[(ip, mac)] = (dpid, in_port)
-            #print "new  accesstable",self.access_table
             return
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)

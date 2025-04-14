@@ -2,14 +2,16 @@ import csv
 import os
 '''
     Goal of this file:
-        Input: Iperf server records.
-        Ouput: A csv file with headers
+        Input: Iperf server records. e.g. 1_3.out
+        Ouput: A csv file with these headers
             "Time,  Transfer(MBytes),   Bandwidth(Mbits/sec),   Packet_Lost,
             Total_Packets,  Min_Latency(ms),    Max_Latency(ms),    Avg_Latency(ms)"
 
 "
 '''
-file_root =  "/home/admin123/Desktop/grad/env/codeM/log/"
+# file_root =  "/home/admin123/Desktop/grad/env/codeM/log/CHFM/"
+file_root =  "/home/admin123/Desktop/grad/env/codeM/log/CFM/"
+
 # List of input files to process
 input_files = [
     "1_3.out",
@@ -25,6 +27,11 @@ def convert_to_mbytes(value, unit):
         return value / 1024
     elif unit == "MBytes":
         return value
+    elif  unit == "Bytes":
+        if value == 0.0:
+            return 0.0
+        else:
+            return value / 1048576 # 1024*1024
     else:
         print(f"Warning: Unknown transfer unit: {unit}")
         return value
@@ -36,6 +43,8 @@ def convert_to_mbits_per_sec(value, unit):
         return value / 1000
     elif unit == "Mbits/sec":
         return value
+    elif unit == "bits/sec":
+        return value if value ==0.0 else value/1000000 # value /(10^6)  
     else:
         print(f"Warning: Unknown bandwidth unit: {unit}")
         return value
@@ -101,21 +110,29 @@ def process_file(input_file, output_file):
                 is_overall = True
                 #start_time = "Overall"
                 continue # skip it
-
+            # print(parts)
             
+            idx = parts.index("sec") + 1
             # Find transfered data
-            transfer_idx = parts.index("sec") + 1
-            transfer_value = parts[transfer_idx]
-            transfer_unit = parts[transfer_idx + 1]
+            transfer_value = parts[idx]
+            transfer_unit = parts[idx + 1]
             
             # Find bandwidth data
-            bandwidth_idx = transfer_idx + 2
-            bandwidth_value = parts[bandwidth_idx]
-            bandwidth_unit = parts[bandwidth_idx + 1]
+            idx = idx + 2
+            bandwidth_value = parts[idx]
+            bandwidth_unit = parts[idx + 1]
             
+            idx = parts.index("ms") + 1
             # Find packets lost and total packets
-            packets_lost = parts[10].split("/")[0] 
-            total_packets = parts[11]
+            packet_lostNtotal = parts[idx].split("/") # usually at idx 10
+            packets_lost = packet_lostNtotal[0]
+            if packet_lostNtotal[1] and packet_lostNtotal != "":
+                total_packets = packet_lostNtotal[1]
+                idx+=2
+            else:
+                idx +=1
+                total_packets = parts[idx]
+                idx += 2
             # for i, part in enumerate(parts):
             #     if "/" in part and "(" in parts[i+1]:
             #         packets_info = part.split("/")
@@ -124,21 +141,21 @@ def process_file(input_file, output_file):
             #         break
             
             # Find latency information
-            latency_info = parts[13].split("/")
-            #
-            
-            
-            
+            latency_info = parts[idx].split("/") # usually idx 13
+            idx += 1 # usually 14
+            avg_latency,min_latency,max_latency =0,0,0
             avg_latency = latency_info[0]
             if len(latency_info)<3:
                 #print("parts:",parts)
                 #print("latency_info:",latency_info)
-                latency_info = parts[14].split("/")
+                latency_info = parts[idx].split("/")
+                idx += 1
                 #print("more latency_info:",latency_info)
                 min_latency = latency_info[0]
                 #max_latency = latency_info[1]
                 if len(latency_info)<2:
-                    latency_info = parts[15].split("/")
+                    latency_info = parts[idx].split("/")
+                    idx += 1
                     max_latency = latency_info[0]
             else:
                 min_latency = latency_info[1]
@@ -150,14 +167,15 @@ def process_file(input_file, output_file):
             
             # Create or update entry in aggregated_data
             if start_time not in aggregated_data:
+                
                 aggregated_data[start_time] = {
                     "transfer": transfer_mbytes,
                     "bandwidth": bandwidth_mbits,
                     "packets_lost": int(packets_lost),
                     "total_packets": int(total_packets),
-                    "min_latency": float(min_latency),
-                    "max_latency": float(max_latency),
-                    "avg_latency": [float(avg_latency),float(avg_latency)] # 0 is avg, 1,2,3,4... are records 
+                    "min_latency": 0 if min_latency == "-" else float(min_latency),
+                    "max_latency": 0 if max_latency == "-" else float(max_latency),
+                    "avg_latency": [0 if avg_latency == "-" else float(avg_latency),0 if avg_latency == "-" else float(avg_latency)] # 0 is avg, 1,2,3,4... are records 
                 }
             else:
                 # Add values for the same timestamp
@@ -165,8 +183,11 @@ def process_file(input_file, output_file):
                 aggregated_data[start_time]["bandwidth"] += bandwidth_mbits
                 aggregated_data[start_time]["packets_lost"] += int(packets_lost)
                 aggregated_data[start_time]["total_packets"] += int(total_packets)
-                
+                #print (f"transfer: {transfer_mbytes}, bandwidth:{bandwidth_mbits}, packets_lost: {int(packets_lost)}, total_packets: {int(total_packets)}")
                 # Keep only the minimum min_latency
+                if min_latency == '-': # inside inpu5 file (e.g 1_3.out): -/-/-/- ms
+                    continue # no need to process
+                print("min_latency: ",min_latency)
                 if float(min_latency) < aggregated_data[start_time]["min_latency"]:
                     aggregated_data[start_time]["min_latency"] = float(min_latency)
                 

@@ -1,9 +1,9 @@
 ------------------------------------------------------------
-Client connecting to 10.0.0.10, UDP port 5001 with pid 4470
+Client connecting to 10.0.0.10, UDP port 5001 with pid 34021
 Sending 1470 byte datagrams, IPG target: 1246.13 us (kalman adjust)
 UDP buffer size:  208 KByte (default)
 ------------------------------------------------------------
-[  3] local 10.0.0.9 port 58869 connected with 10.0.0.10 port 5001
+[  3] local 10.0.0.9 port 46766 connected with 10.0.0.10 port 5001
 [ ID] Interval            Transfer     Bandwidth      Write/Err  PPS
 [  3] 0.0000-5.0000 sec  5.63 MBytes  9.44 Mbits/sec  4014/0      803 pps
 [  3] 5.0000-10.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
@@ -11,12 +11,12 @@ UDP buffer size:  208 KByte (default)
 [  3] 15.0000-20.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 20.0000-25.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 25.0000-30.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
-[  3] 30.0000-35.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 30.0000-35.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 35.0000-40.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 40.0000-45.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 45.0000-50.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
-[  3] 50.0000-55.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
-[  3] 55.0000-60.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 50.0000-55.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 55.0000-60.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
 [  3] 60.0000-65.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 65.0000-70.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 70.0000-75.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
@@ -24,16 +24,16 @@ UDP buffer size:  208 KByte (default)
 [  3] 80.0000-85.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 85.0000-90.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 90.0000-95.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
-[  3] 95.0000-100.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
-[  3] 100.0000-105.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 95.0000-100.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 100.0000-105.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 105.0000-110.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 110.0000-115.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
-[  3] 115.0000-120.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 115.0000-120.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
 [  3] 120.0000-125.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 125.0000-130.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 130.0000-135.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 135.0000-140.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
-[  3] 140.0000-145.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 140.0000-145.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
 [  3] 145.0000-150.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 150.0000-155.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 155.0000-160.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
@@ -46,8 +46,150 @@ UDP buffer size:  208 KByte (default)
 [  3] 190.0000-195.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 195.0000-200.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 200.0000-205.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 205.0000-210.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 210.0000-215.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 215.0000-220.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 220.0000-225.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 225.0000-230.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 230.0000-235.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 235.0000-240.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 240.0000-245.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 245.0000-250.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 250.0000-255.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 255.0000-260.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 260.0000-265.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 265.0000-270.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 270.0000-275.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 275.0000-280.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 280.0000-285.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 285.0000-290.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 290.0000-295.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 0.0000-300.0008 sec   338 MBytes  9.44 Mbits/sec  240745/0      802 pps
+[  3] Sent 240745 datagrams
+[  3] Server Report:
+[  3] 0.0000-300.3254 sec   229 MBytes  6.39 Mbits/sec   0.689 ms 77457/240745 (32%) 259.590/10.959/430.086/ 0.125 ms  801 pps  3.08
+[  3] 0.0000-300.3254 sec  193 datagrams received out-of-order
+------------------------------------------------------------
+Client connecting to 10.0.0.10, UDP port 5001 with pid 37352
+Sending 1470 byte datagrams, IPG target: 1246.13 us (kalman adjust)
+UDP buffer size:  208 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.0.9 port 56245 connected with 10.0.0.10 port 5001
+[ ID] Interval            Transfer     Bandwidth      Write/Err  PPS
+[  3] 0.0000-5.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 5.0000-10.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 10.0000-15.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 15.0000-20.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 20.0000-25.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 25.0000-30.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 30.0000-35.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 35.0000-40.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 40.0000-45.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 45.0000-50.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 50.0000-55.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 55.0000-60.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 60.0000-65.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 65.0000-70.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 70.0000-75.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 75.0000-80.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 80.0000-85.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 85.0000-90.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 90.0000-95.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 95.0000-100.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 100.0000-105.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 105.0000-110.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 110.0000-115.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 115.0000-120.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 120.0000-125.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 125.0000-130.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 130.0000-135.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 135.0000-140.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 140.0000-145.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 145.0000-150.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 150.0000-155.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 155.0000-160.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 160.0000-165.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 165.0000-170.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 170.0000-175.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 175.0000-180.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 180.0000-185.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 185.0000-190.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 190.0000-195.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 195.0000-200.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 200.0000-205.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 205.0000-210.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 210.0000-215.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 215.0000-220.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 220.0000-225.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 225.0000-230.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 230.0000-235.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 235.0000-240.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 240.0000-245.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 245.0000-250.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 250.0000-255.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 255.0000-260.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 260.0000-265.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 265.0000-270.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 270.0000-275.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 275.0000-280.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 280.0000-285.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 285.0000-290.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 290.0000-295.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 0.0000-300.0011 sec   338 MBytes  9.44 Mbits/sec  240745/0      802 pps
+[  3] Sent 240745 datagrams
+[  3] Server Report:
+[  3] 0.0000-300.3047 sec   222 MBytes  6.21 Mbits/sec   0.617 ms 82263/240746 (34%) 274.948/14.699/479.973/ 0.080 ms  801 pps  2.82
+[  3] 0.0000-300.3047 sec  196 datagrams received out-of-order
+------------------------------------------------------------
+Client connecting to 10.0.0.10, UDP port 5001 with pid 40510
+Sending 1470 byte datagrams, IPG target: 1246.13 us (kalman adjust)
+UDP buffer size:  208 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.0.9 port 51097 connected with 10.0.0.10 port 5001
+[ ID] Interval            Transfer     Bandwidth      Write/Err  PPS
+[  3] 0.0000-5.0000 sec  5.63 MBytes  9.44 Mbits/sec  4014/0      803 pps
+[  3] 5.0000-10.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 10.0000-15.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 15.0000-20.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 20.0000-25.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 25.0000-30.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 30.0000-35.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 35.0000-40.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 40.0000-45.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 45.0000-50.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 50.0000-55.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 55.0000-60.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 60.0000-65.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 65.0000-70.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 70.0000-75.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 75.0000-80.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 80.0000-85.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 85.0000-90.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 90.0000-95.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 95.0000-100.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 100.0000-105.0000 sec  5.62 MBytes  9.43 Mbits/sec  4011/0      802 pps
+[  3] 105.0000-110.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 110.0000-115.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 115.0000-120.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 120.0000-125.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 125.0000-130.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 130.0000-135.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 135.0000-140.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      803 pps
+[  3] 140.0000-145.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 145.0000-150.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 150.0000-155.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 155.0000-160.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 160.0000-165.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 165.0000-170.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 170.0000-175.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 175.0000-180.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 180.0000-185.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 185.0000-190.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 190.0000-195.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 195.0000-200.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 200.0000-205.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 205.0000-210.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
-[  3] 210.0000-215.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 210.0000-215.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
 [  3] 215.0000-220.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 220.0000-225.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 225.0000-230.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
@@ -58,14 +200,11 @@ UDP buffer size:  208 KByte (default)
 [  3] 250.0000-255.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 255.0000-260.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 260.0000-265.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
-[  3] 265.0000-270.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
+[  3] 265.0000-270.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
 [  3] 270.0000-275.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
-[  3] 275.0000-280.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      803 pps
+[  3] 275.0000-280.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 280.0000-285.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
 [  3] 285.0000-290.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
-[  3] 290.0000-295.0000 sec  5.63 MBytes  9.44 Mbits/sec  4013/0      802 pps
+[  3] 290.0000-295.0000 sec  5.62 MBytes  9.44 Mbits/sec  4012/0      802 pps
 [  3] 0.0000-300.0008 sec   338 MBytes  9.44 Mbits/sec  240745/0      802 pps
 [  3] Sent 240745 datagrams
-[  3] Server Report:
-[  3] 0.0000-300.5971 sec   180 MBytes  5.03 Mbits/sec  18.727 ms 112256/240747 (47%) 308.361/38.171/771.751/ 0.032 ms  800 pps  2.04
-[  3] 0.0000-300.5971 sec  181 datagrams received out-of-order

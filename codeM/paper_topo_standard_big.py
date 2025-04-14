@@ -8,6 +8,10 @@ from mininet.log import setLogLevel, info
 from mininet.link import TCLink, Intf
 from subprocess import call
 from time import sleep, time, ctime
+import os
+from mininet.term import makeTerms
+
+
 
 def MininetTopo():
     net = Mininet (topo=None, build=False)
@@ -167,6 +171,9 @@ def MininetTopo():
 
     sleep(5)
     
+    if not test_pingall_with_retries(net, retries=3, delay=2):
+        net.stop()
+        sys.exit(1)  # Exit the program if pingAll fails 3 times
     #p1=h2.cmd('iperf -s -u -i 5 > ./log/'+h2.name+'.out&')
     #h1.popen('iperf -s -u -i 5 >> h1')
     #h6.popen('iperf -s -u -i 5 >> h6')
@@ -248,6 +255,7 @@ def MininetTopo():
         if t==450:
             break
 
+    os.system("ffplay -nodisp -autoexit ringtone.mp3")
 
     CLI(net)
     net.stop()
@@ -265,17 +273,39 @@ def iperf_single(hosts=None, udpBw='10M', period=60, port=5001):
         bwArgs = '-b ' + udpBw + ' '
         
         ''' command line example
-        "iperf -u -s -e -i -5 >> ./log/1_3.out&"
+        "iperf -u -s -e -i -5 >> ./log/CHFM/1_3.out&"
         "iperf -u -c 10.0.0.1 -b 10M -i 5 -e -t 60 >> ./log/cleant1_3.out&"
         '''
         #print "***start server***"
-        server.cmd( iperfArgs + '-s -e -i 5' + ' >> ./log/' + filename + '&')
+        # server.cmd( iperfArgs + '-s -e -i 5 >> ./log/CHFM/' + filename + ' | ts& ')
+        server.cmd( iperfArgs +"-s -e -i 5 >./log/CFM/"+filename+"&")
+        # server.cmd( iperfArgs +"-s -e -i 5 | ts >./log/CHFM/"+filename+"&") # add timestamp at the beginning of logs
+
+        # makeTerms([server], 'iperf -s -e -i 5 >> ./log/CFM/')
+         
+        # makeTerms([server], cmd='bash -c "iperf -s -e -i 5 >> ./log/CFM/; exec bash"')
+        # server.popen('xterm -e bash -c "'+ iperfArgs + '-s -e -i 5 >> ./log/CFM/' + filename +'; exec bash"')
+        # server.popen(iperfArgs + '-s -e -i 5 >> ./log/CHFM_org/' + filename +'; exec bash"')
         #print "***start client***"
         client.cmd(
             iperfArgs +' -c ' + server.IP() + ' ' + bwArgs
             +'-i 5'+ ' -e -t '+ str(period) +' >> ./log/' + 'client' + filename +'&')
         #print (iperfArgs +' -c ' + server.IP() + ' ' + bwArgs
         #    +'-i 5'+ '-t '+ str(period) +' > ./log/' + 'client' + filename +'&')
+
+def test_pingall_with_retries(net, retries=3, delay=2):
+    for attempt in range(1, retries + 1):
+        print("\n[INFO] Attempt ",attempt, " of ",retries," - Running pingAll...")
+        result = net.pingAll(timeout='1')  # Returns packet loss %
+        if result == 0.0:
+            print("[SUCCESS] All hosts reachable!")
+            return True
+        else:
+            print("[WARNING] PingAll failed with " ,result,"% packet loss. Retrying in ",delay," seconds...")
+            time.sleep(delay)
+
+    print("[ERROR] pingAll failed after multiple retries. Stopping simulation.")
+    return False
 
 if __name__ == '__main__':
     setLogLevel('info')

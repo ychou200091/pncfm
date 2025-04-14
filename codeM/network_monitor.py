@@ -57,20 +57,20 @@ class NetworkMonitor(app_manager.RyuApp):
         self.graph = None
         self.capabilities = None
         self.best_paths = None
-        self.pre_load_table = {} 
-        self.load_diff_table = {}
-        self.freeload_table = {}
-        self.to_calculate = {}
-        self.link_load_table = {}
-        self.flow_change_table = {}
-        self.warning_flow_table = {}
-        self.load_loss_table ={}
+	self.pre_load_table = {} 
+	self.load_diff_table = {}
+	self.freeload_table = {}
+	self.to_calculate = {}
+	self.link_load_table = {}
+	self.flow_change_table = {}
+	self.warning_flow_table = {}
+	self.load_loss_table ={}
         # Start to green thread to monitor traffic and calculating
         # free bandwidth of links respectively.
         self.monitor_thread = hub.spawn(self._monitor)
         self.save_freebandwidth_thread = hub.spawn(self._save_bw_graph)
 	
-    # detects when a swtich connect or disconnect to the controller
+   # detects when a swtich connect or disconnect to the controller
     @set_ev_cls(ofp_event.EventOFPStateChange,
                 [MAIN_DISPATCHER, DEAD_DISPATCHER])
     def _state_change_handler(self, ev):
@@ -102,7 +102,7 @@ class NetworkMonitor(app_manager.RyuApp):
                 self.best_paths = None
             hub.sleep(setting.MONITOR_PERIOD)
             if self.stats['flow'] or self.stats['port']:
-                self.show_stat('port')
+		self.show_stat('port')
                 self.show_stat('flow')
                 
                 hub.sleep(1)
@@ -203,6 +203,7 @@ class NetworkMonitor(app_manager.RyuApp):
                     bw_dst = bw_dict[dst_dpid][dst_port]
                     bandwidth = min(bw_src, bw_dst)
 
+		    
                     # add key:value of bandwidth into graph.
                     graph[src_dpid][dst_dpid]['bandwidth'] = bandwidth
                 else:
@@ -218,7 +219,7 @@ class NetworkMonitor(app_manager.RyuApp):
         # Calculate free bandwidth of port and save it.
         port_state = self.port_features.get(dpid).get(port_no)
         if port_state:
-
+	
             capacity = port_state[2]
             curr_bw = self._get_free_bw(capacity, speed)
             #print "capacity: ",capacity," speed:",speed," curr_bw: ",curr_bw
@@ -257,49 +258,52 @@ class NetworkMonitor(app_manager.RyuApp):
         """
             Register access host info into access table.
         """
-        #if dpid==13 or dpid==14 or dpid==15 or dpid==16 or dpid==17 or dpid==18:
-        #    return	
-        #for key in host_loc:
-        #   if dpid==key[0] and link_port[1]==key[1]:
-        #      return
+	#if dpid==13 or dpid==14 or dpid==15 or dpid==16 or dpid==17 or dpid==18:
+	#    return	
+	#for key in host_loc:
+	 #   if dpid==key[0] and link_port[1]==key[1]:
+	  #      return
         key=(link_host,dpid,link_port)
 	
 
         if key in self.pre_load_table and key in self.load_diff_table:
-            diff=packet-self.pre_load_table[key]
-            if diff<0:
+	    diff=packet-self.pre_load_table[key]
+	    if diff<0:
                 diff=0#packet
 
 	    
             self.load_diff_table[key] =diff #round((load-self.pre_load_table[(dpid, outport)])*8/(10*1024*1024*12),2)
-            self.pre_load_table[key]=packet
-            #if dpid==2 and outport==3:
-                #self.freeload_table[(dpid, outport)] = 1
+	    self.pre_load_table[key]=packet
+	    #if dpid==2 and outport==3:
+		#self.freeload_table[(dpid, outport)] = 1
+
             return
           
         else:
+
+	    
             self.pre_load_table.setdefault(key, None)
             self.pre_load_table[key] = packet
 	    
-            self.load_diff_table.setdefault(key, None)
-            self.load_diff_table[key] = packet
+	    self.load_diff_table.setdefault(key, None)
+	    self.load_diff_table[key] = packet
 
-            self.sortedDictValues(self.pre_load_table)
-            self.sortedDictValues(self.load_diff_table)
+	    self.sortedDictValues(self.pre_load_table)
+	    self.sortedDictValues(self.load_diff_table)
 
 
 
-        if link_host not in self.load_loss_table:
+	if link_host not in self.load_loss_table:
 
-            self.load_loss_table.setdefault(link_host, None)
+	    self.load_loss_table.setdefault(link_host, None)
             self.load_loss_table[link_host] = 0
 
             '''
-            self.freeload_table.setdefault((dpid, outport), None)
-            #if dpid==2 and outport==3:
-            #   self.freeload_table[(dpid, outport)] = 1
-            #else:
-            self.freeload_table[(dpid, outport)] = 0
+	    self.freeload_table.setdefault((dpid, outport), None)
+	    #if dpid==2 and outport==3:
+		#self.freeload_table[(dpid, outport)] = 1
+	    #else:
+	    self.freeload_table[(dpid, outport)] = 0
 
 	    for key in self.awareness.link_to_port:
 	    	if (dpid==key[0] and outport==self.awareness.link_to_port[key][0] ) or  (dpid==key[1] and outport==self.awareness.link_to_port[key][1]):
@@ -314,65 +318,63 @@ class NetworkMonitor(app_manager.RyuApp):
 	    self.to_calculate.setdefault(link, None)
 	    self.to_calculate[link] = 0
 	    '''
-        return
+            return
 
 
     def calcu_loss_rate(self):
-        for key in  self.load_loss_table:
+	for key in  self.load_loss_table:
             #print 'key:',key , (self.communication.help_other_domain) 
-            if (key not in self.communication.help_other_domain.keys()) and (ip_domain[key[0]]!=switch_domain[CONF.ofp_tcp_listen_port] or ip_domain[key[1]]!=switch_domain[CONF.ofp_tcp_listen_port]):
-                continue
-            send_port=self.awareness.get_host_location(key[0])
-            recv_port=self.awareness.get_host_location(key[1])
+	    if (key not in self.communication.help_other_domain.keys()) and (ip_domain[key[0]]!=switch_domain[CONF.ofp_tcp_listen_port] or ip_domain[key[1]]!=switch_domain[CONF.ofp_tcp_listen_port]):
+	        continue
+	    send_port=self.awareness.get_host_location(key[0])
+	    recv_port=self.awareness.get_host_location(key[1])
             if key in self.communication.help_other_domain.keys():
                 send_port=(7,3)
                 recv_port=(14,1)
             if key in self.communication.flow_gateway.keys():
                 send_port=(13,1)
                 #recv_port=(4,4)
-            send_packet=0
-            recv_packet=0
-            print send_port,recv_port
-            for key2 in self.load_diff_table:
-                if key2[0]==key:# flow the same 
-                    print key2,"diff:",self.load_diff_table[key2]
-                    if key2[1]==send_port[0] and key2[2][0]==send_port[1]:#dpid the same and port the same
-                        if self.load_diff_table[key2]>send_packet:
-                            send_packet=self.load_diff_table[key2]
-                    if key2[1]==recv_port[0] and key2[2][1]==recv_port[1]:
-                        if self.load_diff_table[key2]>recv_packet:
-                            recv_packet=self.load_diff_table[key2]
+	    send_packet=0
+	    recv_packet=0
+	    print send_port,recv_port
+	    for key2 in self.load_diff_table:
+		if key2[0]==key:# flow the same 
+		    print key2,"diff:",self.load_diff_table[key2]
+		    if key2[1]==send_port[0] and key2[2][0]==send_port[1]:#dpid the same and port the same
+			if self.load_diff_table[key2]>send_packet:
+			    send_packet=self.load_diff_table[key2]
+		    if key2[1]==recv_port[0] and key2[2][1]==recv_port[1]:
+			if self.load_diff_table[key2]>recv_packet:
+			    recv_packet=self.load_diff_table[key2]
 	
-            print "flow:",key,"send_packet:",send_packet,"recv_packet:",recv_packet,'\n'
-            if send_packet!=0:
-                self.load_loss_table[key]=abs(send_packet-recv_packet)/send_packet
-            else:
-                self.load_loss_table[key]=0
+	    print "flow:",key,"send_packet:",send_packet,"recv_packet:",recv_packet,'\n'
+	    if send_packet!=0:
+	        self.load_loss_table[key]=abs(send_packet-recv_packet)/send_packet
+	    else:
+		self.load_loss_table[key]=0
 	
 
     def set_load_weight(self,flow):
         #if flow in self.communication.help_other_domain:#if change one times the dpid will leave the old rule
         #    return
-        for key in self.load_diff_table:
+	for key in self.load_diff_table:
         #    print "KKey: ",key 
-            if key[0]==flow:
-                link=key[1],key[2][1]
+	    if key[0]==flow:
+		link=key[1],key[2][1]
                 #print "Link to port :",self.awareness.link_to_port
-                for key2 in self.awareness.link_to_port: #key2=> dpid,dpid
+		for key2 in self.awareness.link_to_port: #key2=> dpid,dpid
         #            print "keyy2: ",key2
-                    if (key[1]==key2[0] and key[2][1]==self.awareness.link_to_port[key2][0] ) :#dpid and port to find dpid dpid
-                        print "(dpid, outport):",link,"key:",key2
-                        if key2 in self.flow_change_table :
-                            self.flow_change_table[key2].append((key[0]))
-                        else:
-                            self.flow_change_table[key2]=list() 
-                            self.flow_change_table[key2].append((key[0]))
+	    	    if (key[1]==key2[0] and key[2][1]==self.awareness.link_to_port[key2][0] ) :#dpid and port to find dpid dpid
+		        print "(dpid, outport):",link,"key:",key2
+			if key2 in self.flow_change_table :
+			    self.flow_change_table[key2].append((key[0]))
+
+
+			else:
+			    self.flow_change_table[key2]=list() 
+			    self.flow_change_table[key2].append((key[0]))
 		    
     def select_the_warningflow(self,flow_change_list):
-        '''
-        If multiple flows are congested, it randomly selects one.
-        Prioritizes flows involved in inter-domain communication.
-        '''
         tmp=list(set(flow_change_list).intersection(set(self.communication.help_other_domain.keys())))#if help other warning should selete it
         tmp2=list(set(flow_change_list).intersection(set(self.communication.flow_gateway.keys())))#because the information on dpid will leave should omit it
         if tmp2:
@@ -392,42 +394,42 @@ class NetworkMonitor(app_manager.RyuApp):
                 flow=('10.0.0.4','10.0.0.2')#dead 1
             else:
                 k=random.randint(0,len(flow_change_list)-1)
-                flow=flow_change_list[k]
+	        flow=flow_change_list[k]
             return flow
             
 
 
 
     def set_warning_flow(self):
-        for key in self.flow_change_table:
-            print "link:",key,"values: ",self.flow_change_table[key]," member num:",len(self.flow_change_table[key])
+	for key in self.flow_change_table:
+	    print "link:",key,"values: ",self.flow_change_table[key]," member num:",len(self.flow_change_table[key])
 
-            if len(self.flow_change_table[key])>=2:#only two flow in same dpid_dpid will deal
-                print "This link is congestion,the link is",key
-                if self.warning_flow_table :#first in is null
-                    for key_2 in self.warning_flow_table :#if not impore still select this flow
-                        if key_2 in self.flow_change_table[key]:
-                            flow=key_2
-                            print "still select:",flow
+	    if len(self.flow_change_table[key])>=2:#only two flow in same dpid_dpid will deal
+		print "This link is congestion,the link is",key
+		if self.warning_flow_table :#first in is null
+		    for key_2 in self.warning_flow_table :#if not impore still select this flow
+		        if key_2 in self.flow_change_table[key]:
+			    flow=key_2
+			    print "still select:",flow
 
-                        else:
+		        else:
                             flow=self.select_the_warningflow(self.flow_change_table[key])
-                            #k=random.randint(0,len(self.flow_change_table[key])-1)
-                            #flow=self.flow_change_table[key][k]
-                            print "select:",flow
-                else:
-                    #k=random.randint(0,len(self.flow_change_table[key])-1)#random select flow
+			    #k=random.randint(0,len(self.flow_change_table[key])-1)
+	    		    #flow=self.flow_change_table[key][k]
+	    		    print "select:",flow
+	        else:
+		    #k=random.randint(0,len(self.flow_change_table[key])-1)#random select flow
 	            
-                    #flow=self.flow_change_table[key][k]
+	            #flow=self.flow_change_table[key][k]
                     flow=self.select_the_warningflow(self.flow_change_table[key])
                     if flow is None:
                         break
-                    print "select:",flow
+	            print "select:",flow
 
 	    
-                if flow not in self.warning_flow_table.keys():
-                    self.warning_flow_table.setdefault(flow, None)
-                    self.warning_flow_table[flow]=1
+	        if flow not in self.warning_flow_table.keys():
+		    self.warning_flow_table.setdefault(flow, None)
+	            self.warning_flow_table[flow]=1
 		    #self.warning_flow_table.setdefault((flow[1],flow[0]), None)
 	            #self.warning_flow_table[(flow[1],flow[0])]=1
 
@@ -436,26 +438,27 @@ class NetworkMonitor(app_manager.RyuApp):
 
 
     def record_link_load(self):
-        for key in self.link_load_table:
-            self.link_load_table[key]=0
+	for key in self.link_load_table:
+	    self.link_load_table[key]=0
 
-        for key in self.load_diff_table:
-            for key2 in self.awareness.link_to_port:
-                if (key[0]==key2[0] and key[1]==self.awareness.link_to_port[key2][0] ) or  (key[0]==key2[1] and key[1]==self.awareness.link_to_port[key2][1]):
-                    self.link_load_table[key2]+=self.load_diff_table[key]
-                    break
+	for key in self.load_diff_table:
+	    for key2 in self.awareness.link_to_port:
+	    	if (key[0]==key2[0] and key[1]==self.awareness.link_to_port[key2][0] ) or  (key[0]==key2[1] and key[1]==self.awareness.link_to_port[key2][1]):
+		    self.link_load_table[key2]+=self.load_diff_table[key]
+		    break
 	
     def set_free_load_table(self,load_mean):
-        link_stdev = array([self.link_load_table[key] for key in self.link_load_table.keys()]).std()
-        threshold=load_mean+link_stdev
-        print "Threshold:",threshold
+	link_stdev = array([self.link_load_table[key] for key in self.link_load_table.keys()]).std()
+	threshold=load_mean+link_stdev
+	print "Threshold:",threshold
 
-        for key in self.link_load_table:
-            if self.link_load_table[key]>threshold:
-                for key2 in self.awareness.link_to_port:
-                    if key==key2:
-                        self.freeload_table[key[0],self.awareness.link_to_port[key][0]]=1
-                        self.freeload_table[key[1],self.awareness.link_to_port[key][1]]=1
+	for key in self.link_load_table:
+	    if self.link_load_table[key]>threshold:
+		for key2 in self.awareness.link_to_port:
+		    if key==key2:
+			self.freeload_table[key[0],self.awareness.link_to_port[key][0]]=1
+			self.freeload_table[key[1],self.awareness.link_to_port[key][1]]=1
+
 
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
@@ -610,7 +613,9 @@ class NetworkMonitor(app_manager.RyuApp):
         print "send help trigger count: ",self.communication.send_help_count
         bodys = self.stats[type]
         if(type == 'flow'):
-            self.flow_change_table.clear()
+
+
+	    self.flow_change_table.clear()
             #self.warning_flow_table.clear()
 	    
             print('datapath         ''   in-port        ip-dst      '
@@ -633,56 +638,56 @@ class NetworkMonitor(app_manager.RyuApp):
                         stat.packet_count, stat.byte_count,
                         abs(self.flow_speed[dpid][(stat.match.get('in_port'),stat.match.get('ipv4_dst'),stat.instructions[-1].actions[0].port)][-1])))
 
-                    link_host=stat.match.get('ipv4_src'),stat.match.get('ipv4_dst')
-                    link_port=stat.match['in_port'],stat.instructions[-1].actions[0].port
-                    self.register_load_info(link_host,dpid,link_port,stat.packet_count)
+		    link_host=stat.match.get('ipv4_src'),stat.match.get('ipv4_dst')
+		    link_port=stat.match['in_port'],stat.instructions[-1].actions[0].port
+		    self.register_load_info(link_host,dpid,link_port,stat.packet_count)
 
 
-                    '''
-                    if stat.byte_count>0:
-                    if key in self.freeload_table :
-                            if self.freeload_table[key]==1 :
-                            print stat.match['ipv4_src'],stat.match['ipv4_dst'],"should warning"
-                        for key2 in self.awareness.link_to_port:
-                                if (key[0]==key2[0] and key[1]==self.awareness.link_to_port[key2][0] ) or  (key[0]==key2[1] and key[1]==self.awareness.link_to_port[key2][1]):
-                            link_key=key2
-                            break
+		    '''
+		    if stat.byte_count>0:
+			if key in self.freeload_table :
+		    	    if self.freeload_table[key]==1 :
+			        print stat.match['ipv4_src'],stat.match['ipv4_dst'],"should warning"
+				for key2 in self.awareness.link_to_port:
+	    			    if (key[0]==key2[0] and key[1]==self.awareness.link_to_port[key2][0] ) or  (key[0]==key2[1] and key[1]==self.awareness.link_to_port[key2][1]):
+					link_key=key2
+					break
 
 
 
 
 
-                        if link_key not in self.flow_change_table:
-                            self.flow_change_table[link_key]=list()
-                        self.flow_change_table[link_key].append((stat.match['ipv4_src'],stat.match['ipv4_dst']))
+				if link_key not in self.flow_change_table:
+				    self.flow_change_table[link_key]=list()
+				self.flow_change_table[link_key].append((stat.match['ipv4_src'],stat.match['ipv4_dst']))
 
-                        #self.flow_change_table.append((stat.match['ipv4_src'],stat.match['ipv4_dst'],key))
-                    '''
-            '''
-            print self.flow_change_table
-            if self.flow_change_table:
-                self.set_warning_flow()
-            else:
-                self.warning_flow_table.clear()
+				#self.flow_change_table.append((stat.match['ipv4_src'],stat.match['ipv4_dst'],key))
+		    '''
+	    '''
+	    print self.flow_change_table
+	    if self.flow_change_table:
+		self.set_warning_flow()
+	    else:
+		self.warning_flow_table.clear()
 
-            '''
+	    '''
 		
-            self.calcu_loss_rate()
+	    self.calcu_loss_rate()
 
-            if self.load_loss_table:
-                for key in self.load_loss_table:
-                    # print "flow:",key,"loss_rate:",self.load_loss_table[key]
-                    if self.load_loss_table[key]>0.2 and  self.load_loss_table[key]<1.0:
-                        self.set_load_weight(key)#set flow change
-                        self.set_warning_flow()#set warning on flow change
+	    if self.load_loss_table:
+		for key in self.load_loss_table:
+		    print "flow:",key,"loss_rate:",self.load_loss_table[key]
+		    if self.load_loss_table[key]>0.2 and  self.load_loss_table[key]<1.0:
+			self.set_load_weight(key)#set flow change
+			self.set_warning_flow()#set warning on flow change
 			
-            if self.flow_change_table:
-                for key2 in self.flow_change_table:
-                    print 'flow_change_table:', key2,self.flow_change_table[key2]
+	    if self.flow_change_table:
+		for key2 in self.flow_change_table:
+		    print 'flow_change_table:', key2,self.flow_change_table[key2]
             #for test
             if ('10.0.0.2','10.0.0.4') in self.warning_flow_table :
                     self.warning_flow_table.pop(('10.0.0.2','10.0.0.4'))#bug the table speed not update
-            print "The warning_flow_table:",self.warning_flow_table,'\n'
+	    print "The warning_flow_table:",self.warning_flow_table,'\n'
 
             print '\n'
 

@@ -139,13 +139,7 @@ class ShortestForwarding(app_manager.RyuApp):
         if use_meter:
             inst.append(parser.OFPInstructionMeter(self.metertable[(match['ipv4_src'],match['ipv4_dst'])],ofproto.OFPIT_METER))
             #print "use_meter :",inst
-        
-        
-        #instStr = vars(inst) if hasattr(inst, '__dict__') else str(inst)
-            
-        # print("flow info: %s\n\tpriority:%d,\n\tidle_timeout:%d,\n\t match:%s,\n\tinst:%s" % (str(dp), p, idle_timeout, str(match), str(inst)))
-        print ("[New flow] IPV4 src_ip: ",match['ipv4_src'], ", dest_ip:", match['ipv4_dst'], ",in_port: ",  match['in_port'] ) 
-        
+
         mod = parser.OFPFlowMod(datapath=dp, priority=p,
                                 idle_timeout=idle_timeout,
                                 hard_timeout=hard_timeout,
@@ -554,7 +548,7 @@ class ShortestForwarding(app_manager.RyuApp):
         in_port = msg.match['in_port']
 	
         #result = self.get_sw(datapath.id, in_port, ip_src, ip_dst)
-        dst_location = self.awareness.get_host_location(ip_dst)
+	dst_location = self.awareness.get_host_location(ip_dst)
         #print "dst_loc: ",dst_location
         #result:
         src_sw=self.network_commun.flow_gateway[(ip_src,ip_dst)][1]
@@ -585,7 +579,7 @@ class ShortestForwarding(app_manager.RyuApp):
 
                 print ("[Alter2_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
                 flow_info = (eth_type, ip_src, ip_dst, in_port)
-                print flow_info
+		print flow_info
                 # install flow entries to datapath along side the path.
                 self.install_flow(2,self.datapaths,
                                   self.awareness.link_to_port,
@@ -613,7 +607,6 @@ class ShortestForwarding(app_manager.RyuApp):
             return paths[best_path],False
     def do_help(self,msg,eth_type,ip_src,ip_dst):
         datapath = msg.datapath
-        print datapath
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
         in_port = msg.match['in_port']
@@ -622,8 +615,7 @@ class ShortestForwarding(app_manager.RyuApp):
         if (ip_src,ip_dst) in self.monitor.warning_flow_table.keys():
             path,have_higher_bw=self.get_new_path_help(path[0],path[-1],self.flow_size[(ip_src,ip_dst)])
             #change the table path
-            '''
-            if have_higher_bw is False or self.network_commun.help_other_domain[(ip_src,ip_dst)][3]>=1: #sconchance or not have_higher_bw
+            '''            if have_higher_bw is False or self.network_commun.help_other_domain[(ip_src,ip_dst)][3]>=1: #sconchance or not have_higher_bw
                 print("notify the domain!!!!!!")
                 if (ip_src,ip_dst) not in self.metertable.keys():
                     other_domain_flow_token=self.network_commun.weight_flow[(ip_src,ip_dst)]
@@ -635,10 +627,13 @@ class ShortestForwarding(app_manager.RyuApp):
                     self.network_commun.send_congestion(ip_src,ip_dst,help_bw=self.metertable[(ip_src,ip_dst)])#dead
                     #self.metertable[(ip_src,ip_dst)]=[4,0]
             elif self.network_commun.help_other_domain[(ip_src,ip_dst)][3]==0:
-            '''
-            if self.network_commun.help_other_domain[(ip_src,ip_dst)][3]==0:
                 self.network_commun.help_other_domain[(ip_src,ip_dst)][3]=self.network_commun.help_other_domain[(ip_src,ip_dst)][3]+1
                 #self.monitor.warning_flow_table.pop((ip_src,ip_dst))
+                self.network_commun.help_other_domain[(ip_src,ip_dst)][2]=path
+                print("Change hlep path---->Path=",path)'''
+            if self.network_commun.help_other_domain[(ip_src,ip_dst)][3]==0:
+                #self.network_commun.help_other_domain[(ip_src,ip_dst)][3]=self.network_commun.help_other_domain[(ip_src,ip_dst)][3]+1
+                self.monitor.warning_flow_table.pop((ip_src,ip_dst))
                 self.network_commun.help_other_domain[(ip_src,ip_dst)][2]=path
                 print("Change hlep path---->Path=",path)
             self.monitor.warning_flow_table.pop((ip_src,ip_dst))
@@ -664,9 +659,9 @@ class ShortestForwarding(app_manager.RyuApp):
         pkt = packet.Packet(msg.data)
         arp_pkt = pkt.get_protocol(arp.arp)
         ip_pkt = pkt.get_protocol(ipv4.ipv4)
-        graph = self.awareness.graph 
+	graph = self.awareness.graph 
         if   isinstance(arp_pkt, arp.arp) and (ip_domain[arp_pkt.src_ip]==switch_domain[CONF.ofp_tcp_listen_port] or ip_domain[arp_pkt.dst_ip]==switch_domain[CONF.ofp_tcp_listen_port]):	 
-            #print "ARP processing: ID= ",datapath.id," ", arp_pkt.src_ip ," to ",arp_pkt.dst_ip
+            print "ARP processing: ID= ",datapath.id," ", arp_pkt.src_ip ," to ",arp_pkt.dst_ip
             self.arp_forwarding(msg, arp_pkt.src_ip, arp_pkt.dst_ip)
 
         '''
@@ -702,20 +697,15 @@ class ShortestForwarding(app_manager.RyuApp):
                         self.alter_path_one(msg, eth_type, ip_pkt.src, ip_pkt.dst)
                         self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst)
                     
-                elif flow  in self.monitor.warning_flow_table.keys() :
-                    # packet lost rate too high, maybe ask help.
-                    if flow not in self.network_commun.help_list.keys() or (flow in self.network_commun.help_list.keys() and time()>self.network_commun.help_list[flow][0]+self.network_commun.help_list[flow][1]):#and back not in self.network_commun.help_list.keys():
-                        # help has not register, ask help
-                        # or help record timeout occured, ask help
+                elif  flow  in self.monitor.warning_flow_table.keys() :
+	            if flow not in self.network_commun.help_list.keys() or (flow in self.network_commun.help_list.keys() and time()>self.network_commun.help_list[flow][0]+self.network_commun.help_list[flow][1]):#and back not in self.network_commun.help_list.keys():
                         print  "IPV4 processing(alter) ID=",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst
-                        # this has never been triggered
                         self.network_commun.send_help(out_door[ip_pkt.src],out_door[ip_pkt.dst],ip_pkt.src,ip_pkt.dst,self.flow_size[flow],self.weight_flow[flow])
                     else:
-                        # help has registered, send to help route in ordinary way.
                         print  "IPV4 processing(shortest_forwarding) ID= ",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst
                         self.shortest_forwarding(msg, eth_type, ip_pkt.src, ip_pkt.dst)
-                else:
-                    print  "IPV4 processing(shortest_forwarding) ID= ",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst 
-                    self.shortest_forwarding(msg, eth_type, ip_pkt.src, ip_pkt.dst)
+		else:
+		    print  "IPV4 processing(shortest_forwarding) ID= ",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst 
+		    self.shortest_forwarding(msg, eth_type, ip_pkt.src, ip_pkt.dst)
                     
             #self.network_commun.__help()
