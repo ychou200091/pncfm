@@ -256,7 +256,7 @@ def MininetTopo():
             break
 
     os.system("ffplay -nodisp -autoexit ringtone.mp3")
-
+    
     CLI(net)
     net.stop()
 def iperf_single(hosts=None, udpBw='10M', period=60, port=5001):
@@ -278,7 +278,7 @@ def iperf_single(hosts=None, udpBw='10M', period=60, port=5001):
         '''
         #print "***start server***"
         # server.cmd( iperfArgs + '-s -e -i 5 >> ./log/CHFM/' + filename + ' | ts& ')
-        server.cmd( iperfArgs +"-s -e -i 5 >./log/CFM/"+filename+"&")
+        server.cmd( iperfArgs +"-s -e -i 5 >./log/CHFM/"+filename+"&")
         # server.cmd( iperfArgs +"-s -e -i 5 | ts >./log/CHFM/"+filename+"&") # add timestamp at the beginning of logs
 
         # makeTerms([server], 'iperf -s -e -i 5 >> ./log/CFM/')

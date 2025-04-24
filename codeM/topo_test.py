@@ -32,27 +32,27 @@ def MininetTopo():
 
     
     info('Create Switch node\n')
-    s1 = net.addSwitch('s1',protocols=["OpenFlow13"],datapath='user')
-    s2 = net.addSwitch('s2',protocols=["OpenFlow13"],datapath='user')
-    s3 = net.addSwitch('s3',protocols=["OpenFlow13"],datapath='user')
-    s4 = net.addSwitch('s4',protocols=["OpenFlow13"],datapath='user')
+    s1 = net.addSwitch('s1',protocols=["OpenFlow13"],datapath='kernel')
+    s2 = net.addSwitch('s2',protocols=["OpenFlow13"],datapath='kernel')
+    s3 = net.addSwitch('s3',protocols=["OpenFlow13"],datapath='kernel')
+    s4 = net.addSwitch('s4',protocols=["OpenFlow13"],datapath='kernel')
 
-    s5 = net.addSwitch('s5',protocols=["OpenFlow13"],datapath='user')
-    s6 = net.addSwitch('s6',protocols=["OpenFlow13"],datapath='user')
-    s7 = net.addSwitch('s7',protocols=["OpenFlow13"],datapath='user')
-    s8 = net.addSwitch('s8',protocols=["OpenFlow13"],datapath='user')
+    s5 = net.addSwitch('s5',protocols=["OpenFlow13"],datapath='kernel')
+    s6 = net.addSwitch('s6',protocols=["OpenFlow13"],datapath='kernel')
+    s7 = net.addSwitch('s7',protocols=["OpenFlow13"],datapath='kernel')
+    s8 = net.addSwitch('s8',protocols=["OpenFlow13"],datapath='kernel')
 
-    s9 = net.addSwitch('s9',protocols=["OpenFlow13"],datapath='user')
-    s10 = net.addSwitch('s10',protocols=["OpenFlow13"],datapath='user')
-    s11 = net.addSwitch('s11',protocols=["OpenFlow13"],datapath='user')
-    s12 = net.addSwitch('s12',protocols=["OpenFlow13"],datapath='user')
+    s9 = net.addSwitch('s9',protocols=["OpenFlow13"],datapath='kernel')
+    s10 = net.addSwitch('s10',protocols=["OpenFlow13"],datapath='kernel')
+    s11 = net.addSwitch('s11',protocols=["OpenFlow13"],datapath='kernel')
+    s12 = net.addSwitch('s12',protocols=["OpenFlow13"],datapath='kernel')
 
-    s13 = net.addSwitch('s13',protocols=["OpenFlow13"],datapath='user')
-    s14 = net.addSwitch('s14',protocols=["OpenFlow13"],datapath='user')
-    s15 = net.addSwitch('s15',protocols=["OpenFlow13"],datapath='user')
-    s16 = net.addSwitch('s16',protocols=["OpenFlow13"],datapath='user')
-    s17 = net.addSwitch('s17',protocols=["OpenFlow13"],datapath='user')
-    s18 = net.addSwitch('s18',protocols=["OpenFlow13"],datapath='user')    
+    s13 = net.addSwitch('s13',protocols=["OpenFlow13"],datapath='kernel')
+    s14 = net.addSwitch('s14',protocols=["OpenFlow13"],datapath='kernel')
+    s15 = net.addSwitch('s15',protocols=["OpenFlow13"],datapath='kernel')
+    s16 = net.addSwitch('s16',protocols=["OpenFlow13"],datapath='kernel')
+    s17 = net.addSwitch('s17',protocols=["OpenFlow13"],datapath='kernel')
+    s18 = net.addSwitch('s18',protocols=["OpenFlow13"],datapath='kernel')    
 
     info('Create Host node\n')
     h1 = net.addHost('h1', ip='10.0.0.1',mac='00:00:00:00:00:01')
@@ -67,6 +67,13 @@ def MininetTopo():
     h9 =net.addHost('h9', ip='10.0.0.9',mac='00:00:00:00:00:09')
     h10=net.addHost('h10', ip='10.0.0.10',mac='00:00:00:00:00:0A')
     info('Add links\n')
+
+    # set system datapath
+    # print( "Set sw datapath to system")
+    # for sw in net.switches:
+    #     print sw
+    #     sw.cmd('ovs-vsctl set Bridge ',sw, 'datapath_type=system')
+    # print( "verify sw datapath changes")
     #domain 1 switch link
     net.addLink(s1, s2, 1, 1,cls=TCLink,bw=10,use_tbf=True)
     net.addLink(s1, s3, 2, 1,cls=TCLink,bw=10,use_tbf=True)
@@ -74,7 +81,7 @@ def MininetTopo():
     net.addLink(s2, s4, 3, 1,cls=TCLink,bw=10,use_tbf=True)
     
     #domain 1 host
-    net.addLink(s1, h1, 4, 0,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s1, h1, 4, 0,cls=TCLink,bw=10,use_tbf=True )
     net.addLink(s3, h2, 3, 0,cls=TCLink,bw=10,use_tbf=True)
     net.addLink(s4, h3, 5, 0,cls=TCLink,bw=10,use_tbf=True)
     net.addLink(s4, h4, 6, 0,cls=TCLink,bw=10,use_tbf=True)
@@ -124,6 +131,8 @@ def MininetTopo():
 
     net.addLink(s8, s18, 4, 1)
     net.addLink(s18, s9, 2, 4)
+    # for sw in net.switches:
+    #     print(sw.cmd('ovs-vsctl get Bridge ',sw,' datapath_type'))  
     
     info( '*** Starting network\n')
     net.build()

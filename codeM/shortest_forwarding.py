@@ -468,7 +468,7 @@ class ShortestForwarding(app_manager.RyuApp):
                 #print self.monitor.best_paths
                 
                 flow_info = (eth_type, ip_src, ip_dst, in_port)
-		print flow_info
+                print flow_info
                 # install flow entries to datapath along side the path.
                 self.install_flow(0,self.datapaths,
                                   self.awareness.link_to_port,
@@ -490,7 +490,7 @@ class ShortestForwarding(app_manager.RyuApp):
 	#print "result :",result
         #if result:
         src_sw= datapath.id
-        dst_sw=self.network_commun.flow_gateway[(ip_src,ip_dst)][0]
+        dst_sw=self.network_commun.flow_gateway[(ip_src,ip_dst)][0] # gateway sw to other domain
             #print "flow_gateway: ",self.network_commun.flow_gateway
             #dst_sw=13
         '''
@@ -525,10 +525,10 @@ class ShortestForwarding(app_manager.RyuApp):
                                   self.awareness.access_table, path,
                                   flow_info, msg.buffer_id, msg.data)
                                   
-        if (ip_src,ip_dst) in self.network_commun.grouptable.keys() :
+        if (ip_src,ip_dst) in self.network_commun.grouptable.keys() : # limiting meter
             print "tmptmp= ",(ip_src,ip_dst),(ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') 
             if (ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') :
-                if self.network_commun.grouptable[(ip_src,ip_dst)][2]==0:
+                if self.network_commun.grouptable[(ip_src,ip_dst)][2]==0: #[40,60,0]
                     self.send_group_Table_add(1,flow_info,5)#dead
                 self.send_group_mod(1,flow_info,5)#dead
             if (ip_src,ip_dst) ==('10.0.0.4','10.0.0.2') :
@@ -548,7 +548,7 @@ class ShortestForwarding(app_manager.RyuApp):
         in_port = msg.match['in_port']
 	
         #result = self.get_sw(datapath.id, in_port, ip_src, ip_dst)
-	dst_location = self.awareness.get_host_location(ip_dst)
+        dst_location = self.awareness.get_host_location(ip_dst)
         #print "dst_loc: ",dst_location
         #result:
         src_sw=self.network_commun.flow_gateway[(ip_src,ip_dst)][1]
@@ -579,7 +579,7 @@ class ShortestForwarding(app_manager.RyuApp):
 
                 print ("[Alter2_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
                 flow_info = (eth_type, ip_src, ip_dst, in_port)
-		print flow_info
+                print flow_info
                 # install flow entries to datapath along side the path.
                 self.install_flow(2,self.datapaths,
                                   self.awareness.link_to_port,
@@ -612,6 +612,7 @@ class ShortestForwarding(app_manager.RyuApp):
         in_port = msg.match['in_port']
         path=self.network_commun.help_other_domain[(ip_src,ip_dst)][2]
         have_higher_bw=False
+        # helping others and the helped flwo is conjested
         if (ip_src,ip_dst) in self.monitor.warning_flow_table.keys():
             path,have_higher_bw=self.get_new_path_help(path[0],path[-1],self.flow_size[(ip_src,ip_dst)])
             #change the table path
@@ -635,7 +636,7 @@ class ShortestForwarding(app_manager.RyuApp):
             #self.monitor.warning_flow_table.pop((ip_dst,ip_src))
         
         path=self.network_commun.help_other_domain[(ip_src,ip_dst)][2]
-        print ("[DO_Help] %s<-->%s: %s" % (ip_src, ip_dst, path))
+        print ("[DO_Help] %s<-->%s: %s, in_port: %s" % (ip_src, ip_dst, path, in_port))
         flow_info=(eth_type, ip_src, ip_dst, in_port)
         self.install_flow(3,self.datapaths,
                                   self.awareness.link_to_port,
@@ -694,9 +695,9 @@ class ShortestForwarding(app_manager.RyuApp):
                                 [0]: in_switch
                                 [1]: out_switch
                         '''
-                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst) # exit org domain
+                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst) # going back to org domain
                     else:
-                        self.alter_path_one(msg, eth_type, ip_pkt.src, ip_pkt.dst)
+                        self.alter_path_one(msg, eth_type, ip_pkt.src, ip_pkt.dst) # might break into 2 paths
                         self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst)
         
                 elif  flow  in self.monitor.warning_flow_table.keys() :

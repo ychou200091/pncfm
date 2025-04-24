@@ -33,9 +33,9 @@ Outputs:
     → Total throughput of the entire network over time.
 
 '''
-file_root = "/home/admin123/Desktop/grad/env/codeM/log/CFM"
-# file_root = "/home/admin123/Desktop/grad/env/codeM/log/CHFM"
-# file_root = "/home/admin123/Desktop/grad/env/codeM/log/CHFM"
+file_root = "/home/admin123/Desktop/grad/env/codeM/log/CHFM"
+#file_root = "/home/admin123/Desktop/grad/env/codeM/log/CHFM"
+# file_root = "/home/admin123/Desktop/grad/env/codeM/log/CFM_org"
 
 file_list = {
     "1_3.csv": {"name": "Flow A", "start_time": 0},
