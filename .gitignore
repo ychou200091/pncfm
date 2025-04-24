@@ -19,3 +19,8 @@
 # git rm --cached OVS281_modify -r
 # git rm --cached /sample -r
 # git rm --cached /ryu -r
+*.awk
+*.out
+*.csv
+*.png
+OVS281_modify.zip
