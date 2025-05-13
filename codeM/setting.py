@@ -1,9 +1,9 @@
 # Common Setting for Networ awareness module.
 
 
-DISCOVERY_PERIOD = 5   			# For discovering topology.
+DISCOVERY_PERIOD = 3   			# For discovering topology.
 
-MONITOR_PERIOD = 5					# For monitoring traffic
+MONITOR_PERIOD = 3					# For monitoring traffic
 
 DELAY_DETECTING_PERIOD = 5			# For detecting link delay.
 

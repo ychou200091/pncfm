@@ -191,7 +191,7 @@ class ShortestForwarding(app_manager.RyuApp):
         actions = [parser.OFPActionGroup(group_id)]
         inst = [parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
         mod = parser.OFPFlowMod(datapath=datapath, priority=1,
-                                idle_timeout=0,flags=ofp.OFPFF_SEND_FLOW_REM,
+                                idle_timeout=2,flags=ofp.OFPFF_SEND_FLOW_REM,
                                 match=match, instructions=inst)
         datapath.send_msg(mod)
     def send_flow_mod(self, datapath, flow_info, src_port, dst_port):
@@ -207,11 +207,11 @@ class ShortestForwarding(app_manager.RyuApp):
             ipv4_src=flow_info[1], ipv4_dst=flow_info[2])
         #print " flow : ", (flow_info[1],flow_info[2]) ,"   one ::>>",(flow_info[1],flow_info[2]) in self.metertable.keys()," two:>> ",(flow_info[1],flow_info[2]) in self.network_commun.help_other_domain.keys()
         if (flow_info[1],flow_info[2]) in self.metertable.keys() :#and (flow_info[1],flow_info[2]) in self.network_commun.help_other_domain.keys():
-                print "add_meter_table! ",datapath.id,"  ",flow_info," ",self.metertable[(flow_info[1], flow_info[2])]
-                self.add_flow(datapath, 1, match, actions,idle_timeout=15, hard_timeout=15,use_meter=True)
+                print "add_meter_table! dpid:",datapath.id,"  ",flow_info,",limit:",self.metertable[(flow_info[1], flow_info[2])]
+                self.add_flow(datapath, 1, match, actions,idle_timeout=5, hard_timeout=5,use_meter=True)
                 #self.metertable[(flow_info[1],flow_info[2])][1]=1
         else:
-            self.add_flow(datapath, 1, match, actions,idle_timeout=15, hard_timeout=15)
+            self.add_flow(datapath, 1, match, actions,idle_timeout=1, hard_timeout=5)
 
     def _build_packet_out(self, datapath, buffer_id, src_port, dst_port, data):
         """
@@ -633,10 +633,13 @@ class ShortestForwarding(app_manager.RyuApp):
                 self.network_commun.help_other_domain[(ip_src,ip_dst)][2]=path
                 print("Change hlep path---->Path=",path)'''
             if self.network_commun.help_other_domain[(ip_src,ip_dst)][3]==0:
-                #self.network_commun.help_other_domain[(ip_src,ip_dst)][3]=self.network_commun.help_other_domain[(ip_src,ip_dst)][3]+1
-                self.monitor.warning_flow_table.pop((ip_src,ip_dst))
-                self.network_commun.help_other_domain[(ip_src,ip_dst)][2]=path
-                print("Change hlep path---->Path=",path)
+                if have_higher_bw:
+                    self.network_commun.help_other_domain[(ip_src,ip_dst)][3]=self.network_commun.help_other_domain[(ip_src,ip_dst)][3]+1
+                    self.monitor.warning_flow_table.pop((ip_src,ip_dst))
+                    self.network_commun.help_other_domain[(ip_src,ip_dst)][2]=path
+                    print("[Do Help: Have_higher_bw]Change hlep path---->Path=",path)
+                else:
+                    print("[Do Help: do not have higher bw]")
             self.monitor.warning_flow_table.pop((ip_src,ip_dst))
             #self.monitor.warning_flow_table.pop((ip_dst,ip_src))
         
