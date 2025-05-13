@@ -28,7 +28,9 @@ from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 from ryu.lib.packet import ipv4
 from ryu.lib.packet import arp
-from time import sleep, time, ctime
+from time import sleep, ctime
+from time import time as current_time
+import time
 from ryu.topology import event, switches
 from ryu.topology.api import get_switch, get_link
 
@@ -191,7 +193,7 @@ class ShortestForwarding(app_manager.RyuApp):
         actions = [parser.OFPActionGroup(group_id)]
         inst = [parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
         mod = parser.OFPFlowMod(datapath=datapath, priority=1,
-                                idle_timeout=0,flags=ofp.OFPFF_SEND_FLOW_REM,
+                                idle_timeout=2,flags=ofp.OFPFF_SEND_FLOW_REM,
                                 match=match, instructions=inst)
         datapath.send_msg(mod)
     def send_flow_mod(self, datapath, flow_info, src_port, dst_port):
@@ -207,11 +209,11 @@ class ShortestForwarding(app_manager.RyuApp):
             ipv4_src=flow_info[1], ipv4_dst=flow_info[2])
         #print " flow : ", (flow_info[1],flow_info[2]) ,"   one ::>>",(flow_info[1],flow_info[2]) in self.metertable.keys()," two:>> ",(flow_info[1],flow_info[2]) in self.network_commun.help_other_domain.keys()
         if (flow_info[1],flow_info[2]) in self.metertable.keys() :#and (flow_info[1],flow_info[2]) in self.network_commun.help_other_domain.keys():
-                print "add_meter_table! ",datapath.id,"  ",flow_info," ",self.metertable[(flow_info[1], flow_info[2])]
-                self.add_flow(datapath, 1, match, actions,idle_timeout=15, hard_timeout=15,use_meter=True)
+                print "add_meter_table! dpid:",datapath.id,"  ",flow_info,",limit:",self.metertable[(flow_info[1], flow_info[2])]
+                self.add_flow(datapath, 1, match, actions,idle_timeout=5, hard_timeout=5,use_meter=True)
                 #self.metertable[(flow_info[1],flow_info[2])][1]=1
         else:
-            self.add_flow(datapath, 1, match, actions,idle_timeout=15, hard_timeout=15)
+            self.add_flow(datapath, 1, match, actions,idle_timeout=1, hard_timeout=5)
 
     def _build_packet_out(self, datapath, buffer_id, src_port, dst_port, data):
         """
@@ -247,7 +249,7 @@ class ShortestForwarding(app_manager.RyuApp):
             access_table: {(sw,port) :(ip, mac)}
         """
         if access_table:
-	    if isinstance(access_table.keys()[0], tuple):
+            if isinstance(access_table.keys()[0], tuple):
                 for key in access_table.keys():
                     if dst_ip == key[0]:
                         dst_port = access_table[key][1]			
@@ -512,8 +514,7 @@ class ShortestForwarding(app_manager.RyuApp):
         if dst_sw:
                 # Path has already calculated, just get it.
                 path = self.get_path(src_sw, dst_sw, weight=self.weight)
-		#path = self.get_path(src_sw, 3, weight=self.weight)
-		
+                print 'src_sw(dpid): ',src_sw,', dst_sw:',dst_sw, ', weight: ', self.weight, ", Path: ",path
                 #self.logger.info("[Alter1_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
 
                 print ("[Alter1_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
@@ -526,7 +527,7 @@ class ShortestForwarding(app_manager.RyuApp):
                                   flow_info, msg.buffer_id, msg.data)
                                   
         if (ip_src,ip_dst) in self.network_commun.grouptable.keys() : # limiting meter
-            print "tmptmp= ",(ip_src,ip_dst),(ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') 
+            print "src_sw(dpid):,", datapath.id,", tmptmp= ",(ip_src,ip_dst),(ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') 
             if (ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') :
                 if self.network_commun.grouptable[(ip_src,ip_dst)][2]==0: #[40,60,0]
                     self.send_group_Table_add(1,flow_info,5)#dead
@@ -573,11 +574,11 @@ class ShortestForwarding(app_manager.RyuApp):
         if dst_sw:
                 # Path has already calculated, just get it.
                 path = self.get_path(src_sw, dst_sw, weight=self.weight)
-		#path = self.get_path(src_sw, 3, weight=self.weight)
+                #path = self.get_path(src_sw, 3, weight=self.weight)
 		
                 #self.logger.info("[Alter2_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
 
-                print ("[Alter2_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
+                print ("[Alter2_PATH], dpid: ",datapath.id, ", %s<-->%s: %s" % (ip_src, ip_dst, path))
                 flow_info = (eth_type, ip_src, ip_dst, in_port)
                 print flow_info
                 # install flow entries to datapath along side the path.
@@ -601,9 +602,10 @@ class ShortestForwarding(app_manager.RyuApp):
                 max_bw=path_bw
                 best_path=i
         if max_bw>leatest_bw:
-            print "max_bw :",max_bw
+            print "max_bw :",max_bw, "new path: ", paths[best_path]
             return paths[best_path],True
         else:
+            print "new path: ", paths[best_path], "max_bw :",max_bw
             return paths[best_path],False
     def do_help(self,msg,eth_type,ip_src,ip_dst):
         datapath = msg.datapath
@@ -612,31 +614,31 @@ class ShortestForwarding(app_manager.RyuApp):
         in_port = msg.match['in_port']
         path=self.network_commun.help_other_domain[(ip_src,ip_dst)][2]
         have_higher_bw=False
-        # helping others and the helped flwo is conjested
+        # helping others and the helped conjested flow
         if (ip_src,ip_dst) in self.monitor.warning_flow_table.keys():
             path,have_higher_bw=self.get_new_path_help(path[0],path[-1],self.flow_size[(ip_src,ip_dst)])
             #change the table path
-            if have_higher_bw is False or self.network_commun.help_other_domain[(ip_src,ip_dst)][3]>=1: #sconchance or not have_higher_bw
-                print("notify the domain!!!!!!")
+            if have_higher_bw is False or self.network_commun.help_other_domain[(ip_src,ip_dst)][3]>=1: #second chance or not have_higher_bw
+                print("notify the domain!!!!!!", "have_higher_bw:",have_higher_bw, "flow help count: ", self.network_commun.help_other_domain[(ip_src,ip_dst)][3] )
                 if (ip_src,ip_dst) not in self.metertable.keys():
                     other_domain_flow_token=self.network_commun.weight_flow[(ip_src,ip_dst)]
                     my_domain_flow_token=self.weight_flow[('10.0.0.5','10.0.0.6')]
                     self.metertable[(ip_src,ip_dst)]=int(float(other_domain_flow_token)/(int(other_domain_flow_token)+int(my_domain_flow_token))*10)
                     self.metertable[('10.0.0.5','10.0.0.6')]=int(float(my_domain_flow_token)/(int(other_domain_flow_token)+int(my_domain_flow_token))*10)
                     print 'Y_Y :','10.0.0.5','10.0.0.6',self.metertable[('10.0.0.5','10.0.0.6')]
-                    print (ip_src,ip_dst),self.metertable[(ip_src,ip_dst)]
+                    print "flow:",(ip_src,ip_dst), ", rate limit: ",self.metertable[(ip_src,ip_dst)]
                     self.network_commun.send_congestion(ip_src,ip_dst,help_bw=self.metertable[(ip_src,ip_dst)])#dead
                     #self.metertable[(ip_src,ip_dst)]=[4,0]
             elif self.network_commun.help_other_domain[(ip_src,ip_dst)][3]==0:
                 self.network_commun.help_other_domain[(ip_src,ip_dst)][3]=self.network_commun.help_other_domain[(ip_src,ip_dst)][3]+1
                 #self.monitor.warning_flow_table.pop((ip_src,ip_dst))
                 self.network_commun.help_other_domain[(ip_src,ip_dst)][2]=path
-                print("Change hlep path---->Path=",path)
+                print("Change help path---->Path=",path)
             self.monitor.warning_flow_table.pop((ip_src,ip_dst))
             #self.monitor.warning_flow_table.pop((ip_dst,ip_src))
         
         path=self.network_commun.help_other_domain[(ip_src,ip_dst)][2]
-        print ("[DO_Help] %s<-->%s: %s, in_port: %s" % (ip_src, ip_dst, path, in_port))
+        print ("[DO_Help] %s<-->%s: %s, in_port: %s, dpid: %s" % (ip_src, ip_dst, path, in_port, datapath.id))
         flow_info=(eth_type, ip_src, ip_dst, in_port)
         self.install_flow(3,self.datapaths,
                                   self.awareness.link_to_port,
@@ -698,10 +700,10 @@ class ShortestForwarding(app_manager.RyuApp):
                         self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst) # going back to org domain
                     else:
                         self.alter_path_one(msg, eth_type, ip_pkt.src, ip_pkt.dst) # might break into 2 paths
-                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst)
+                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst) # going back to org domain
         
                 elif  flow  in self.monitor.warning_flow_table.keys() :
-                    if flow not in self.network_commun.help_list.keys() or (flow in self.network_commun.help_list.keys() and time()>self.network_commun.help_list[flow][0]+self.network_commun.help_list[flow][1]):#and back not in self.network_commun.help_list.keys():
+                    if flow not in self.network_commun.help_list.keys() or (flow in self.network_commun.help_list.keys() and current_time()>self.network_commun.help_list[flow][0]+self.network_commun.help_list[flow][1]):#and back not in self.network_commun.help_list.keys():
                         print  "IPV4 processing(alter) ID=",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst
                         self.network_commun.send_help(out_door[ip_pkt.src],out_door[ip_pkt.dst],ip_pkt.src,ip_pkt.dst,self.flow_size[flow],self.weight_flow[flow])
                         # network_commun.send_help(self, in_switch,out_switch,src_ip,dis_ip,max_bw,max_token)

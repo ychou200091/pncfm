@@ -468,7 +468,7 @@ class ShortestForwarding(app_manager.RyuApp):
                 #print self.monitor.best_paths
                 
                 flow_info = (eth_type, ip_src, ip_dst, in_port)
-		print flow_info
+                print flow_info
                 # install flow entries to datapath along side the path.
                 self.install_flow(0,self.datapaths,
                                   self.awareness.link_to_port,
@@ -490,7 +490,7 @@ class ShortestForwarding(app_manager.RyuApp):
 	#print "result :",result
         #if result:
         src_sw= datapath.id
-        dst_sw=self.network_commun.flow_gateway[(ip_src,ip_dst)][0]
+        dst_sw=self.network_commun.flow_gateway[(ip_src,ip_dst)][0] # gateway sw to other domain
             #print "flow_gateway: ",self.network_commun.flow_gateway
             #dst_sw=13
         '''
@@ -512,8 +512,7 @@ class ShortestForwarding(app_manager.RyuApp):
         if dst_sw:
                 # Path has already calculated, just get it.
                 path = self.get_path(src_sw, dst_sw, weight=self.weight)
-		#path = self.get_path(src_sw, 3, weight=self.weight)
-		
+                print 'src_sw(dpid): ',src_sw,', dst_sw:',dst_sw, ', weight: ', self.weight, ", Path: ",path
                 #self.logger.info("[Alter1_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
 
                 print ("[Alter1_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
@@ -525,10 +524,10 @@ class ShortestForwarding(app_manager.RyuApp):
                                   self.awareness.access_table, path,
                                   flow_info, msg.buffer_id, msg.data)
                                   
-        if (ip_src,ip_dst) in self.network_commun.grouptable.keys() :
-            print "tmptmp= ",(ip_src,ip_dst),(ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') 
+        if (ip_src,ip_dst) in self.network_commun.grouptable.keys() : # limiting meter
+            print "src_sw(dpid):,", datapath.id,", tmptmp= ",(ip_src,ip_dst),(ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') 
             if (ip_src,ip_dst) == ('10.0.0.1','10.0.0.3') :
-                if self.network_commun.grouptable[(ip_src,ip_dst)][2]==0:
+                if self.network_commun.grouptable[(ip_src,ip_dst)][2]==0: #[40,60,0]
                     self.send_group_Table_add(1,flow_info,5)#dead
                 self.send_group_mod(1,flow_info,5)#dead
             if (ip_src,ip_dst) ==('10.0.0.4','10.0.0.2') :
@@ -573,13 +572,13 @@ class ShortestForwarding(app_manager.RyuApp):
         if dst_sw:
                 # Path has already calculated, just get it.
                 path = self.get_path(src_sw, dst_sw, weight=self.weight)
-		#path = self.get_path(src_sw, 3, weight=self.weight)
+                #path = self.get_path(src_sw, 3, weight=self.weight)
 		
                 #self.logger.info("[Alter2_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
 
-                print ("[Alter2_PATH]%s<-->%s: %s" % (ip_src, ip_dst, path))
+                print ("[Alter2_PATH], dpid: ",datapath.id, ", %s<-->%s: %s" % (ip_src, ip_dst, path))
                 flow_info = (eth_type, ip_src, ip_dst, in_port)
-		print flow_info
+                print flow_info
                 # install flow entries to datapath along side the path.
                 self.install_flow(2,self.datapaths,
                                   self.awareness.link_to_port,
@@ -601,9 +600,10 @@ class ShortestForwarding(app_manager.RyuApp):
                 max_bw=path_bw
                 best_path=i
         if max_bw>leatest_bw:
-            print "max_bw :",max_bw
+            print "max_bw :",max_bw, "new path: ", paths[best_path]
             return paths[best_path],True
         else:
+            print "new path: ", paths[best_path], "max_bw :",max_bw
             return paths[best_path],False
     def do_help(self,msg,eth_type,ip_src,ip_dst):
         datapath = msg.datapath
@@ -612,6 +612,7 @@ class ShortestForwarding(app_manager.RyuApp):
         in_port = msg.match['in_port']
         path=self.network_commun.help_other_domain[(ip_src,ip_dst)][2]
         have_higher_bw=False
+        # helping others and the helped conjested flow
         if (ip_src,ip_dst) in self.monitor.warning_flow_table.keys():
             path,have_higher_bw=self.get_new_path_help(path[0],path[-1],self.flow_size[(ip_src,ip_dst)])
             #change the table path
@@ -640,7 +641,7 @@ class ShortestForwarding(app_manager.RyuApp):
             #self.monitor.warning_flow_table.pop((ip_dst,ip_src))
         
         path=self.network_commun.help_other_domain[(ip_src,ip_dst)][2]
-        print ("[DO_Help] %s<-->%s: %s" % (ip_src, ip_dst, path))
+        print ("[DO_Help] %s<-->%s: %s, in_port: %s, dpid: %s" % (ip_src, ip_dst, path, in_port, datapath.id))
         flow_info=(eth_type, ip_src, ip_dst, in_port)
         self.install_flow(3,self.datapaths,
                                   self.awareness.link_to_port,
@@ -659,8 +660,8 @@ class ShortestForwarding(app_manager.RyuApp):
         pkt = packet.Packet(msg.data)
         arp_pkt = pkt.get_protocol(arp.arp)
         ip_pkt = pkt.get_protocol(ipv4.ipv4)
-	graph = self.awareness.graph 
-        if   isinstance(arp_pkt, arp.arp) and (ip_domain[arp_pkt.src_ip]==switch_domain[CONF.ofp_tcp_listen_port] or ip_domain[arp_pkt.dst_ip]==switch_domain[CONF.ofp_tcp_listen_port]):	 
+        graph = self.awareness.graph 
+        if isinstance(arp_pkt, arp.arp) and (ip_domain[arp_pkt.src_ip] == switch_domain[CONF.ofp_tcp_listen_port] or ip_domain[arp_pkt.dst_ip] == switch_domain[CONF.ofp_tcp_listen_port]):	 
             print "ARP processing: ID= ",datapath.id," ", arp_pkt.src_ip ," to ",arp_pkt.dst_ip
             self.arp_forwarding(msg, arp_pkt.src_ip, arp_pkt.dst_ip)
 
@@ -687,20 +688,21 @@ class ShortestForwarding(app_manager.RyuApp):
                 #print "Condition2: ",((ip_pkt.src,ip_pkt.dst) in self.network_commun.flow_gateway.keys())
                 if  flow in self.network_commun.help_other_domain.keys():
                     self.do_help(msg,eth_type,ip_pkt.src,ip_pkt.dst)#the last is path
-                elif  flow  in self.network_commun.flow_gateway.keys()  :
+                elif  flow  in self.network_commun.flow_gateway.keys(): # flow should exit through gateway and come back
                     print  "IPV4 processing(Do change!!!) ID=",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst
                     if datapath.id == 2:
                         self.shortest_forwarding(msg, eth_type, ip_pkt.src, ip_pkt.dst)
                     elif datapath.id == self.network_commun.flow_gateway[flow][1]: #back_switch
-                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst)
+                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst) # going back to org domain
                     else:
-                        self.alter_path_one(msg, eth_type, ip_pkt.src, ip_pkt.dst)
-                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst)
+                        self.alter_path_one(msg, eth_type, ip_pkt.src, ip_pkt.dst) # might break into 2 paths
+                        self.alter_path_two(msg, eth_type, ip_pkt.src, ip_pkt.dst) # going back to org domain
                     
                 elif  flow  in self.monitor.warning_flow_table.keys() :
 	            if flow not in self.network_commun.help_list.keys() or (flow in self.network_commun.help_list.keys() and time()>self.network_commun.help_list[flow][0]+self.network_commun.help_list[flow][1]):#and back not in self.network_commun.help_list.keys():
                         print  "IPV4 processing(alter) ID=",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst
                         self.network_commun.send_help(out_door[ip_pkt.src],out_door[ip_pkt.dst],ip_pkt.src,ip_pkt.dst,self.flow_size[flow],self.weight_flow[flow])
+                        # network_commun.send_help(self, in_switch,out_switch,src_ip,dis_ip,max_bw,max_token)
                     else:
                         print  "IPV4 processing(shortest_forwarding) ID= ",datapath.id," :",ip_pkt.src ," to ",ip_pkt.dst
                         self.shortest_forwarding(msg, eth_type, ip_pkt.src, ip_pkt.dst)

@@ -161,12 +161,13 @@ class Controller_Communication(app_manager.RyuApp):
                 print "---------------------"
         elif jsondata['command']=='Congestion_Notify':
             if jsondata['Domain'] == switch_domain[CONF.ofp_tcp_listen_port] and (flow) in self.flow_gateway.keys():
-                print "recv_congetsion"
                 bw=jsondata['help_bw']
-                #self.grouptable[flow]=[bw*10,100-bw*10,0]
+                self.grouptable[flow]=[bw*10,100-bw*10,0]
+                print "recv_congetsion :", flow
                 if flow == ('10.0.0.1','10.0.0.3'):
-                    self.grouptable[flow]=[40,60,0]
-                    print "recv_congetsion :", flow
+                    pass
+                    # self.grouptable[flow]=[40,60,0]
+                    
                 if flow == ('10.0.0.4','10.0.0.2'):
                     self.grouptable[flow]=[]
 

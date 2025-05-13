@@ -59,7 +59,7 @@ class NetworkAwareness(app_manager.RyuApp):
         super(NetworkAwareness, self).__init__(*args, **kwargs)
         self.topology_api_app = self
         self.name = "awareness"
-        self.link_to_port = {}       # (src_dpid,dst_dpid)->(src_port,dst_port)
+        self.link_to_port = {}       # (src_dpid,dst_dpid)->(src_port,dst_port) describe how a switch's port connect to another switch's port.
         self.access_table = {}       # {(sw,port) :[host1_ip]}
         self.switch_port_table = {}  # dpip->port_num
         self.access_ports = {}       # dpid->port_num

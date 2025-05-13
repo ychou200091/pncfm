@@ -7,13 +7,16 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 from mininet.link import TCLink, Intf
 from subprocess import call
-from time import sleep, time, ctime
+from time import sleep, ctime
+from time import time as current_time
+import time
 import os
 from mininet.term import makeTerms
 
 
 
 def MininetTopo():
+    simulation_start_time = current_time()
     net = Mininet (topo=None, build=False)
 
     
@@ -160,6 +163,7 @@ def MininetTopo():
     net.get('s16').start([c0])
     net.get('s17').start([c2])
     net.get('s18').start([c1])
+    # apply_tbf_fifo(net)
     info( '*** Post configure switches and hosts\n')    
     '''CLI(net)
     net.stop()'''
@@ -180,80 +184,85 @@ def MininetTopo():
     #h3.popen('iperf -s -u -i 5 >> h3')
     #h4.popen('iperf -s -u -i 5 >> h4')
     #h5.popen('iperf -s -u -i 5 >> h5') 
-    print time(),ctime()
+    print current_time(),ctime()
     #iperf_single( hosts=(h3,h2), udpBw='9M', period=100, port=5001)
     #sleep(0.5)
     #iperf_single( hosts=(h4,h2), udpBw='9M', period=100, port=5001)
     time_start = time()
-    
+    time_start = current_time()
     while True:
-        t = int(time()-time_start)
+        try:
+            cur_time = current_time()
+            t = int(cur_time - time_start)
+            '''if t==5:            
+                iperf_single( hosts=(h3,h2), udpBw='9M', period=100)
+                print 'h3 h2'
+            elif t==45:
+                iperf_single( hosts=(h4,h1), udpBw='6M', period=90)
+                print 'h4 h1'
+            elif t==115:
+                iperf_single( hosts=(h5,h6), udpBw='9M', period=70)
+                print 'h5 h6'
+            elif t==140:
+                iperf_single( hosts=(h1,h3), udpBw='6M', period=165)
+                print 'h1->h3'
+            elif t==185:
+                iperf_single( hosts=(h2,h4), udpBw='9M', period=150)
+                print 'h2->h4'
+            elif t==225:
+                iperf_single( hosts=(h9,h10), udpBw='6M', period=100)
+                print 'h9 h1'
+            elif t==250:
+                iperf_single( hosts=(h5,h6), udpBw='6M', period=100)
+                print 'h9 h10'
+            elif t==365:
+                iperf_single( hosts=(h3,h1), udpBw='6M', period=120)
+                print 'h3 h1'
+            elif t==425:
+                iperf_single( hosts=(h4,h2), udpBw='9M', period=160)
+                print 'h4 h2'''
 
-        '''if t==5:            
-            iperf_single( hosts=(h3,h2), udpBw='9M', period=100)
-            print 'h3 h2'
-        elif t==45:
-            iperf_single( hosts=(h4,h1), udpBw='6M', period=90)
-            print 'h4 h1'
-        elif t==115:
-            iperf_single( hosts=(h5,h6), udpBw='9M', period=70)
-            print 'h5 h6'
-        elif t==140:
-            iperf_single( hosts=(h1,h3), udpBw='6M', period=165)
-            print 'h1->h3'
-        elif t==185:
-            iperf_single( hosts=(h2,h4), udpBw='9M', period=150)
-            print 'h2->h4'
-        elif t==225:
-            iperf_single( hosts=(h9,h10), udpBw='6M', period=100)
-            print 'h9 h1'
-        elif t==250:
-            iperf_single( hosts=(h5,h6), udpBw='6M', period=100)
-            print 'h9 h10'
-        elif t==365:
-            iperf_single( hosts=(h3,h1), udpBw='6M', period=120)
-            print 'h3 h1'
-        elif t==425:
-            iperf_single( hosts=(h4,h2), udpBw='9M', period=160)
-            print 'h4 h2'''
-
-        '''if t==5:
-            iperf_single( hosts=(h6,h5), udpBw='9M', period=225)
-            print 'h6 h5'
-        if t==35:
-            iperf_single( hosts=(h10,h9), udpBw='8M', period=210)
-            print 'h10 h9'
-        if t==50:
-            iperf_single( hosts=(h4,h1), udpBw='9M', period=195)
-            print 'h4 h1'
-        if t==50:
-            iperf_single( hosts=(h3,h2), udpBw='6M', period=225)
-            print 'h3 h2'
-        if t==215:
-            iperf_single( hosts=(h5,h7), udpBw='5M', period=225)
-            print 'h5 h7'
-        if t==230:
-            iperf_single( hosts=(h10,h8), udpBw='8M', period=255)
-            print 'h10 h8'
-        if t==260:
-            iperf_single( hosts=(h7,h4), udpBw='7M', period=225)
-            print 'h7 h4'''
-
-        if t==15:
-            iperf_single( hosts=(h1,h3), udpBw='9M', period=300)
-            print 'h1 h3'
-        if t==15:
-            iperf_single( hosts=(h9,h10), udpBw='9M', period=300)
-            print 'h9 h10'
-        if t==90:
-            iperf_single( hosts=(h2,h4), udpBw='6M', period=300)
-            print 'h2 h4'
-        if t==125:
-            iperf_single( hosts=(h5,h6), udpBw='6M', period=300)
-            print 'h5 h6'
-        sleep(1)
-        if t==450:
-            break
+            '''if t==5:
+                iperf_single( hosts=(h6,h5), udpBw='9M', period=225)
+                print 'h6 h5'
+            if t==35:
+                iperf_single( hosts=(h10,h9), udpBw='8M', period=210)
+                print 'h10 h9'
+            if t==50:
+                iperf_single( hosts=(h4,h1), udpBw='9M', period=195)
+                print 'h4 h1'
+            if t==50:
+                iperf_single( hosts=(h3,h2), udpBw='6M', period=225)
+                print 'h3 h2'
+            if t==215:
+                iperf_single( hosts=(h5,h7), udpBw='5M', period=225)
+                print 'h5 h7'
+            if t==230:
+                iperf_single( hosts=(h10,h8), udpBw='8M', period=255)
+                print 'h10 h8'
+            if t==260:
+                iperf_single( hosts=(h7,h4), udpBw='7M', period=225)
+                print 'h7 h4'''
+            if t%5 == 0:
+                # t2 = cur_time - simulation_start_time
+                # print "Time: ", t, "Time since program starts: ", t2
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                print "Time : ", t, "Time: ", timestamp
+            if t==15:
+                iperf_single( hosts=(h1,h3), udpBw='9m', period=300)
+                print 'h1 h3'
+            if t==20:
+                iperf_single( hosts=(h9,h10), udpBw='9m', period=300)
+                print 'h9 h10'
+            if t==60:
+                iperf_single( hosts=(h2,h4), udpBw='6m', period=250)
+                print 'h2 h4'
+            if t==125:
+                iperf_single( hosts=(h5,h6), udpBw='6m', period=210)
+                print 'h5 h6'
+            sleep(1)
+            if t==450:
+                break
 
     os.system("ffplay -nodisp -autoexit ringtone.mp3")
     
@@ -306,6 +315,22 @@ def test_pingall_with_retries(net, retries=3, delay=2):
 
     print("[ERROR] pingAll failed after multiple retries. Stopping simulation.")
     return False
+
+def apply_tbf_fifo(net, rate="10mbit", burst="15000", latency="12ms", pfifo_limit=1000):
+    print("\n=== Applying TBF + FIFO ===")
+    for sw in net.switches:
+        intfs = sw.intfList()
+        for intf in intfs:
+            if not intf.name.startswith("lo"):
+                # Delete org qdisc
+                os.system("sudo tc qdisc del dev {} root".format(intf.name))
+                # add TBF
+                os.system("sudo tc qdisc add dev {} root handle 1: tbf rate {} burst {} latency {}".format(
+                    intf.name, rate, burst, latency))
+                #add fifo pfifo
+                #os.system("sudo tc qdisc add dev {} parent 1:1 handle 10: sfq limit {}".format(intf.name, pfifo_limit))
+                print("Applied TBF to {}".format(intf.name))
+    print("=== Done ===\n")
 
 if __name__ == '__main__':
     setLogLevel('info')
