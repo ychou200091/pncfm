@@ -1,2 +1,0 @@
-Flow A's packet transfered,Flow A's packet lost,Flow A's packet lost rate,Flow B's packet transfered,Flow B's packet lost,Flow B's packet lost rate,Flow C's packet transfered,Flow C's packet lost,Flow C's packet lost rate,Flow D's packet transfered,Flow D's packet lost,Flow D's packet lost rate,Network's packet transfered,Network's packet lost,Network's packet lost rate
-230707,155005,0.671869514145648,157853,10261,0.06500351592937734,97116,11291,0.11626302566003542,8124,1795,0.22095027080256033,493800,178352,0.3611826650465776
