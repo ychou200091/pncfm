@@ -12,10 +12,13 @@ from time import time as current_time
 import time
 import os
 from mininet.term import makeTerms
+import log.real_bw as real_bw
 
 
 
 def MininetTopo():
+    real_bw.init()
+
     simulation_start_time = current_time()
     net = Mininet (topo=None, build=False)
 
@@ -75,32 +78,33 @@ def MininetTopo():
     #h11=net.addHost('h11', ip='10.0.0.11',mac='00:00:00:00:00:0B')
     #h12=net.addHost('h12', ip='10.0.0.12',mac='00:00:00:00:00:0C')
     info('Add links\n')
+    tc_bw=10
     #domain 1 switch link
-    net.addLink(s1, s2, 1, 1,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s1, s3, 2, 1,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s2, s3, 2, 2,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s2, s4, 3, 1,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s1, s2, 1, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s1, s3, 2, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s2, s3, 2, 2,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s2, s4, 3, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
     
     #domain 1 host
-    net.addLink(s1, h1, 4, 0,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s3, h2, 3, 0,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s4, h3, 5, 0,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s4, h4, 6, 0,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s1, h1, 4, 0,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s3, h2, 3, 0,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s4, h3, 5, 0,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s4, h4, 6, 0,cls=TCLink,bw=tc_bw,use_tbf=True)
 
     #domain 2 switch link
-    net.addLink(s5, s6, 1, 1,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s5, s7, 2, 1,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s7, s8, 2, 2,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s6, s8, 2, 1,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s5, s6, 1, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s5, s7, 2, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s7, s8, 2, 2,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s6, s8, 2, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
     #net.addLink(s5, s8, 3, 3,bw=10)
 
 
     #domain 2 host
-    net.addLink(s5, h5, 4, 0,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s6, h6, 4, 0,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s5, h5, 4, 0,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s6, h6, 4, 0,cls=TCLink,bw=tc_bw,use_tbf=True)
     #modify
-    net.addLink(s7, h9,4,0,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s8, h10,6,0,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s7, h9,4,0,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s8, h10,6,0,cls=TCLink,bw=tc_bw,use_tbf=True)
     #net.addLink(s5,h11,5,0,cls=TCLink,bw=10,use_tbf=True)
     #net.addLink(s7,h12,5,0,cls=TCLink,bw=10,use_tbf=True)
     #domain 3 switch link
@@ -115,18 +119,18 @@ def MininetTopo():
     net.addLink(s12, h8, 3, 0)
     
     #domain link (D1D2)
-    net.addLink(s1, s13, 3, 1,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s13, s7, 2, 3,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s1, s13, 3, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s13, s7, 2, 3,cls=TCLink,bw=tc_bw,use_tbf=True)
     #modify
-    net.addLink(s4, s14, 4, 1,cls=TCLink,bw=10,use_tbf=True)
-    net.addLink(s14, s8, 2, 5,cls=TCLink,bw=10,use_tbf=True)
+    net.addLink(s4, s14, 4, 1,cls=TCLink,bw=tc_bw,use_tbf=True)
+    net.addLink(s14, s8, 2, 5,cls=TCLink,bw=tc_bw,use_tbf=True)
 
     #domain link (D1D3)
-    net.addLink(s4, s15, 3, 1,cls=TCLink,bw=10)
-    net.addLink(s15, s9, 2, 3,cls=TCLink,bw=10)
+    net.addLink(s4, s15, 3, 1,cls=TCLink,bw=tc_bw)
+    net.addLink(s15, s9, 2, 3,cls=TCLink,bw=tc_bw)
 
-    net.addLink(s4, s16, 2, 1,cls=TCLink,bw=10)
-    net.addLink(s16, s11, 2, 4,cls=TCLink,bw=10)
+    net.addLink(s4, s16, 2, 1,cls=TCLink,bw=tc_bw)
+    net.addLink(s16, s11, 2, 4,cls=TCLink,bw=tc_bw)
 
     #domain link (D2D3)
     net.addLink(s6, s17, 3, 1)
@@ -164,6 +168,7 @@ def MininetTopo():
     net.get('s17').start([c2])
     net.get('s18').start([c1])
     # apply_tbf_fifo(net)
+
     info( '*** Post configure switches and hosts\n')    
     '''CLI(net)
     net.stop()'''
@@ -188,12 +193,13 @@ def MininetTopo():
     #iperf_single( hosts=(h3,h2), udpBw='9M', period=100, port=5001)
     #sleep(0.5)
     #iperf_single( hosts=(h4,h2), udpBw='9M', period=100, port=5001)
-    time_start = time()
+    real_bw.init()
     time_start = current_time()
     while True:
         try:
             cur_time = current_time()
             t = int(cur_time - time_start)
+            real_bw.log_bandwidth(real_bw.prev_bytes)
             '''if t==5:            
                 iperf_single( hosts=(h3,h2), udpBw='9M', period=100)
                 print 'h3 h2'
@@ -251,18 +257,25 @@ def MininetTopo():
             if t==15:
                 iperf_single( hosts=(h1,h3), udpBw='9m', period=300)
                 print 'h1 h3'
+                real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h1-h3")
             if t==20:
                 iperf_single( hosts=(h9,h10), udpBw='9m', period=300)
                 print 'h9 h10'
+                real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h9-h10")
             if t==60:
                 iperf_single( hosts=(h2,h4), udpBw='6m', period=250)
                 print 'h2 h4'
+                real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h2-h4")
             if t==125:
                 iperf_single( hosts=(h5,h6), udpBw='6m', period=210)
                 print 'h5 h6'
+                real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h5-h6")
             sleep(1)
             if t==450:
                 break
+        except KeyboardInterrupt:
+            print("Logging stopped.")
+            os.system ("sudo mn -c")
 
     os.system("ffplay -nodisp -autoexit ringtone.mp3")
     
