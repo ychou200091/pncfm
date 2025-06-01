@@ -17,8 +17,9 @@ import setting
 from ryu.lib.packet import ether_types
 from ryu.lib.packet import  in_proto as inet
 from time import sleep, time, ctime
-import zmq
+import zmq, re
 import json
+import flow_info
 
 CONF = cfg.CONF
 ip_domain={'10.0.0.1':1,'10.0.0.2':1,'10.0.0.3':1,'10.0.0.4':1,'10.0.0.5':2,'10.0.0.6':2,'10.0.0.7':3,'10.0.0.8':3,'10.0.0.9':2,'10.0.0.10':2}
@@ -162,7 +163,18 @@ class Controller_Communication(app_manager.RyuApp):
         elif jsondata['command']=='Congestion_Notify':
             if jsondata['Domain'] == switch_domain[CONF.ofp_tcp_listen_port] and (flow) in self.flow_gateway.keys():
                 bw=jsondata['help_bw']
-                self.grouptable[flow]=[bw*10,100-bw*10,0]
+                
+                for flow,info in flow_info.iperf_flow_info.iteritems():
+                    if info["src_ip"] == flow[0] and info["dst_ip"] == flow[1]:# flow find
+                        org_bw = self.normalize_to_mbps(info["bw"])
+                        out_ratio = (1 if bw/org_bw > 1 else bw/org_bw) * 100
+                        self.grouptable[flow]=[out_ratio,100-out_ratio,0] # out_ratio(out of 100), in_ratio, help count
+                        print "flow", flow, "Split: ", self.grouptable[flow]
+                        # out_ratio: the percentage of bandwidth help_domain can help
+                        # in_bw: the  percentage of bandwidth orginal domain needs to handle
+                        # self.grouptable[flow]=[bw*10,100-bw*10,0] # org code
+                        break
+
                 print "recv_congetsion :", flow
                 if flow == ('10.0.0.1','10.0.0.3'):
                     pass
@@ -243,4 +255,10 @@ class Controller_Communication(app_manager.RyuApp):
         return socket
          
          
-
+    def normalize_to_mbps(s):
+        match = re.match(r'(\d+)([mM])', s)
+        if not match:
+            raise ValueError("Invalid format: {}".format(s))
+        value, unit = match.groups()
+        value = int(value)
+        return value * 8 if unit == 'M' else value

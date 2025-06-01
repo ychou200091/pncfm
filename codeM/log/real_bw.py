@@ -27,27 +27,6 @@ def write_header_if_needed():
             writer.writerow(['timestamp'] + INTERFACES)
 
 
-def log_bandwidth(prev_bytes):
-    """Calculate bandwidth and write to CSV."""
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    row = [timestamp]
-
-    for iface in INTERFACES:
-        curr_bytes = get_tx_bytes(iface)
-        prev = prev_bytes.get(iface)
-
-        if curr_bytes is None or prev is None:
-            row.append('N/A')
-        else:
-            delta_bytes = curr_bytes - prev
-            mbps = (delta_bytes * 8.0) / 1e6  # Convert to Mbit/s
-            row.append("{:.2f}".format(mbps))
-            prev_bytes[iface] = curr_bytes
-
-    with open(CSV_FILE, 'a', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(row)
-
 def log_bandwidth(prev_bytes, msg=None):
     
     """Calculate bandwidth and write to CSV (Python 2 version)."""
@@ -62,8 +41,8 @@ def log_bandwidth(prev_bytes, msg=None):
             row.append('N/A')
         else:
             delta_bytes = curr_bytes - prev
-            mbps = (delta_bytes * 8.0) / 1e6  # Convert to Mbit/s
-            row.append("{0:.2f}".format(mbps))
+            mbps = (delta_bytes * 8.0) / 1000000  # Convert to Mbit/s
+            row.append("{0:.4f}".format(mbps))
             prev_bytes[iface] = curr_bytes
 
     if msg is not None:

@@ -147,7 +147,7 @@ def process_file(input_file, output_file):
             
             # Determine if this is an overall summary line
             is_overall = False
-            if start_time == "0.0000" and "sec" in parts[3] and float(end_time) > 100:
+            if start_time == "0.0000" and "sec" in parts[3] and float(end_time) > 10:
                 is_overall = True
                 #start_time = "Overall"
                 continue # skip it

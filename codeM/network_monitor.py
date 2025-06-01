@@ -31,6 +31,7 @@ import setting
 import random
 from numpy import array
 import time
+from flow_info import *
 CONF = cfg.CONF
 host_loc={(5,4),(6,4),(11,5),(12,3),(7,3),(7,4),(8,4),(6,3),(9,3),(11,4),(10,4),(9,4)}
 out_door={13:2,4:4,14:1,7:3,14:1}
@@ -355,35 +356,135 @@ class NetworkMonitor(app_manager.RyuApp):
             else:
                 self.load_loss_table[key]=0
 	
+    def flag_congested_paths(self):
+        '''
+        Flow packet lost rate too high,
+        document congested flows and its path/links.
+        document flows on the same path.
+        '''
+        if self.load_loss_table: 
+            for key in self.load_loss_table:
+                if self.load_loss_table[key] != 0 :
+                    print "\n[network_monitor.py] flow:",key,"loss_rate:", self.load_loss_table[key] 
 
-    def set_load_weight(self,flow):
+                if self.load_loss_table[key]>0.2 and  self.load_loss_table[key]<1.0:
+                    print "[Packet lost too high] flow:",key, "(load_loss_table key(src,dst)), loss_rate:",self.load_loss_table[key]
+                    #self.set_load_weight(key)#set flow change
+                    self.flag_links(key)
+
+    def flag_links(self,congested_flow):
+        ''' 
+        add links of congested flow to flow_change_table 
+        add all flows on congest links to flow_change table
+        congested_info ex: (('10.0.0.1', '10.0.0.3'), 1, (4, 1)) 
+        '''
+        congested_links = {}
+        
+        print "In Flagigng links, congested flow: ", congested_flow
+        
+        
+        for key in self.load_diff_table:
+            # ex: (('10.0.0.1', '10.0.0.3'), 1, (4, 1)) 
+            # key meaning: (flow, dpid, (in-port & out-port))
+            if key[0]==congested_flow:
+                print "key", key
+                
+                flow_link=key[1],key[2][1]
+                # key[1] is dpid (switch id)
+                # key[2][1] is  out-port number of the switch
+                
+                for key2 in self.awareness.link_to_port: #key2=> dpid,dpid
+                    # key2 represent 2 switches
+                    # I added many variable names for readability.
+                    flow_dpid = flow_link[0]
+                    flow_dpid_out_port = flow_link[1]
+                    
+                    link_src_dpid,link_dst_dpid = key2
+                    # print "link_src_dpid,link_dst_dpid", (link_src_dpid,link_dst_dpid)
+                    # print "flow_link:",flow_link
+
+                    link_src_out_port = self.awareness.link_to_port[key2][0]
+                    link_dst_in_port = self.awareness.link_to_port[key2][1]
+
+                    if flow_dpid != link_src_dpid: # not same sw
+                        continue
+                    if flow_dpid_out_port != link_src_out_port: # not same port
+                        continue
+                    # print "!sw_pair found: ",link_src_dpid,link_dst_dpid
+                    congested_links[flow_link]=link_src_dpid,link_dst_dpid #document congested link switch pair of congested flow
+                    # found matching src_sw, dst_sw pair
+                    if key2 in self.flow_change_table :
+                        if congested_flow in self.flow_change_table[key2]:
+                            continue # skip, flow already in flow_change_table
+                        self.flow_change_table[key2].append((key[0]))
+                    
+                    else:
+                        self.flow_change_table[key2]=list() 
+                        self.flow_change_table[key2].append((key[0]))
+                    print "On link",flow_link,",connect sw(",link_src_dpid,",",link_dst_dpid , "), add flow:",key[0], "to flow_change_table"
+        # add all flows on congest links to flow_change table
+        for congested_link in congested_links:
+            for key in self.load_diff_table:
+                if congested_link != (key[1],key[2][1]): # is flow on the same link
+                    continue
+                flow = key[0]
+                if not self.is_flow_in_flow_change_table(flow): 
+                    # add flow to flow_change_table
+                    sw_pair = congested_links[congested_link] 
+                    self.flow_change_table[sw_pair].append(flow)
+                    print "On link",congested_link,",connect sw(",sw_pair, "), add flow:",flow, "to flow_change_table"
+        print "----\n Flag links result. flow_change_table:\n\t", self.flow_change_table,"\n----"
+
+                        
+
+    def is_flow_in_flow_change_table(self,flow):
+        # flow_change_table. Key is switch pair, a tuple of (dpid, dpid)
+        # ex, key = (2,4), represents the connection between sw2-sw4
+        # value is a list of congested flows on this link.
+        # ex, value = [(10.0.0.1,10.0.0.3), (10.0.0.2,10.0.0.4)]
+
+        for sw_link,congested_flows in self.flow_change_table.iteritems(): 
+            if flow in congested_flows: # skip, flow already in flow_change_table
+               return True
+        return False
+
+    
+
+    def set_load_weight(self,flow): # flag paths to flow_change_table
         #if flow in self.communication.help_other_domain:#if change one times the dpid will leave the old rule
         #    return
         for key in self.load_diff_table: # packet lost = send - recv
+            # key ex: (('10.0.0.1', '10.0.0.3'), 1, (4, 1)) 
+            # key meaning: (flow, dpid, (in-port & out-port))
             if key[0]==flow:
                 link=key[1],key[2][1]
                 # key[1] is dpid (switch id)
-                # key[2][1] is port number of the given switch
-                # ex:(Set load weight) (key[1],key[2][1]): (1, 1)
-                #print "(Set load weight) (key[1],key[2][1]):", link  # dpid, port
+                # key[2][1] is  out-port number of the switch
                 
-
                 # print "Link to port :",self.awareness.link_to_port # link_to_port: describe how sw are connected through port #
                 for key2 in self.awareness.link_to_port: #key2=> dpid,dpid
                     # key2 represent 2 switches
                     if (key[1]==key2[0] and key[2][1]==self.awareness.link_to_port[key2][0] ) :#dpid and port to find dpid dpid
-                            #print "(dpid, outport):",link,"key:",key2 # dpid,port connect dpid1 and dpid2(what switches does this port on this switch link together)
+                        print "(dpid, outport):",link,"key:",key2 # dpid,port connect dpid1 and dpid2(what switches does this port on this switch link together)
                         if key2 in self.flow_change_table :
                             self.flow_change_table[key2].append((key[0]))
-                            print "On link",link,", add flow",key[0], "to flow_change_table"
+                            
                         else:
                             self.flow_change_table[key2]=list() 
                             self.flow_change_table[key2].append((key[0]))
-		    
+                        print "On link",link,", add flow",key[0], "to flow_change_table"
+    def set_load_weight2(self,flow):
+        pass
+        '''
+        if flow change table has a congested flow, it checks if its path encounters multiple flows, if so, it adds them to flow change table as well, so controller can select what to route.
+        '''
+
+
     def select_the_warningflow(self,flow_change_list):
         tmp=list(set(flow_change_list).intersection(set(self.communication.help_other_domain.keys())))#if help other warning should selete it
         tmp2=list(set(flow_change_list).intersection(set(self.communication.flow_gateway.keys())))#because the information on dpid will leave should omit it
         print "[select_the_warningflow] tmp: ", tmp, "\ttmp2: ", tmp2
+        print "[select_the_warningflow] flow_change_list: ",flow_change_list
         if tmp2:
             return 
         if tmp and len(tmp) ==1:
@@ -395,22 +496,24 @@ class NetworkMonitor(app_manager.RyuApp):
             print "select_the_warningflow, random flow: ", flow
             return tmp[k]
         else:
-            if ('10.0.0.1','10.0.0.3') in flow_change_list:
-                flow=('10.0.0.1','10.0.0.3')#dead
-            if ('10.0.0.4','10.0.0.1') in flow_change_list:
-                flow=('10.0.0.4','10.0.0.1')#dead 1
-            if ('10.0.0.4','10.0.0.2') in flow_change_list:
-                flow=('10.0.0.4','10.0.0.2')#dead 1
-            else:
-                k=random.randint(0,len(flow_change_list)-1)
-                flow=flow_change_list[k]
-            print "select_the_warningflow, flow: ", flow
-            return flow
+            highest_prioirty_flow = None
+            highest_prioirty= -1
+            for flow in flow_change_list:
+                if flow_priority[flow]> highest_prioirty:
+                    highest_prioirty = flow_priority[flow]
+                    highest_prioirty_flow = flow
+            
+            # else:
+            #     k=random.randint(0,len(flow_change_list)-1)
+            #     flow=flow_change_list[k]
+            print "select_the_warningflow, flow: ", highest_prioirty_flow
+            return highest_prioirty_flow
             
 
 
 
     def set_warning_flow(self):
+        
         for key in self.flow_change_table:
             print "link:",key,"values: ",self.flow_change_table[key]," member num:",len(self.flow_change_table[key])
 
@@ -466,6 +569,43 @@ class NetworkMonitor(app_manager.RyuApp):
                         self.freeload_table[key[0],self.awareness.link_to_port[key][0]]=1
                         self.freeload_table[key[1],self.awareness.link_to_port[key][1]]=1
 
+    def deal_warning_flow(self):
+        for item in self.warning_flow_table:
+            if item in self.communication.help_list.keys():
+                continue
+            if item in self.help_other_domain.keys():
+                if self.help_other_domain[item][3]>0: # helped already don't trigger again
+                    continue
+
+            print "warning flow table item: ", item
+            src_ip = item[0]
+            dst_ip = item[1]
+            self.delete_flows_by_ip_pair(src_ip,dst_ip)
+            # del flows from switches to trigger them to ask controller.
+    def delete_flows_by_ip_pair(self, src_ip, dst_ip):
+        for dpid in self.datapaths:
+            dp = self.datapaths[dpid]
+            ofproto = dp.ofproto
+            parser = dp.ofproto_parser
+
+            match = parser.OFPMatch(
+                eth_type=0x0800,  # IPv4
+                ipv4_src=src_ip,
+                ipv4_dst=dst_ip
+            )
+
+            mod = parser.OFPFlowMod(
+                datapath=dp,
+                command=ofproto.OFPFC_DELETE,
+                out_port=ofproto.OFPP_ANY,
+                out_group=ofproto.OFPG_ANY,
+                match=match,
+                priority=1  # Adjust priority if necessary
+            )
+
+            dp.send_msg(mod)
+            self.logger.info("Sent delete command for flow %s -> %s on DPID %s" %
+                            (src_ip, dst_ip, dpid))
 
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
@@ -683,25 +823,35 @@ class NetworkMonitor(app_manager.RyuApp):
 	    '''
 		
             self.calcu_loss_rate()
+            self.flag_congested_paths()
+            self.set_warning_flow() # Select the right flow to reroute
+            self.deal_warning_flow()
 
-            if self.load_loss_table: # print loss table content and set warning flow
-                for key in self.load_loss_table:
-                    if not (self.load_loss_table[key] == 0) :
-                        print "\"network_monitor.py\" flow:",key,"loss_rate:", self.load_loss_table[key]
+            print "=======================\n"
+            print "Load_Diff_Table: "
+            if self.load_diff_table:
+                for key2 in self.load_diff_table:
+                    print "\t", key2,": ",self.load_diff_table[key2]
+            print '-----\n'
+            
+            print "Load_Loss_Table:"
+            if self.load_loss_table:
+                for key2 in self.load_loss_table:
+                    print "\t", key2,": ",self.load_loss_table[key2]
+            print '-----\n'
 
-                    if self.load_loss_table[key]>0.2 and  self.load_loss_table[key]<1.0:
-                        print "[Packet lost too high]","loss table's key(src,dst):",key, "rate:",self.load_loss_table[key]
-                        self.set_load_weight(key)#set flow change
-                        self.set_warning_flow()#set warning on flow change
-			
+            print "Flow_change_table: "
             if self.flow_change_table:
                 for key2 in self.flow_change_table:
-                    print 'flow_change_table:', key2,self.flow_change_table[key2]
-            #for testflow_change_table
-            if ('10.0.0.2','10.0.0.4') in self.warning_flow_table :
-                self.warning_flow_table.pop(('10.0.0.2','10.0.0.4'))#bug the table speed not update
-            print "The warning_flow_table:",self.warning_flow_table,'\n'
-            print '\n'
+                    print "\t", key2,": ",self.flow_change_table[key2]
+            print '-----\n'
+
+            print "Warning_flow_table: "
+            if self.warning_flow_table:
+                for key2 in self.warning_flow_table:
+                    print "\t", key2,": ",self.warning_flow_table[key2]
+            print '-----\n'
+            print "=======================\n"
 
         '''if(type == 'port'):
 
