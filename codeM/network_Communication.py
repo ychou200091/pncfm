@@ -125,7 +125,6 @@ class Controller_Communication(app_manager.RyuApp):
 
 
     def deal(self,jsondata):#help_other_domain[flow][in_switch,out_switch,path,times(second chance)] i'm lazy.
-        print "jsondata: ",jsondata
         flow =(jsondata['src_ip'],jsondata['dis_ip'])     
 
         if jsondata['command'] =='Help' :
@@ -134,7 +133,6 @@ class Controller_Communication(app_manager.RyuApp):
             print "gateway_domain[gateway_link[jsondata['in_switch']]]: ",gateway_domain[gateway_link[jsondata['in_switch']]]
             print "gateway_domain[gateway_link[jsondata['in_switch']]]== switch_domain[CONF.ofp_tcp_listen_port]: ",gateway_domain[gateway_link[jsondata['in_switch']]]== switch_domain[CONF.ofp_tcp_listen_port]
             # print "domain, ",gateway_domain[gateway_link[jsondata['in_switch']]]== switch_domain[CONF.ofp_tcp_listen_port]  , "  ",gateway_domain[gateway_link[jsondata['out_switch']]]
-            print "------------------------------"
             print "jsondata['in_switch']: ", jsondata['in_switch']
             print "gateway_link[jsondata['in_switch']]", gateway_link[jsondata['in_switch']]
             print "gateway_domain[gateway_link[jsondata['in_switch']]], ", gateway_domain[gateway_link[jsondata['in_switch']]] 
@@ -149,7 +147,7 @@ class Controller_Communication(app_manager.RyuApp):
                         print "self.help_other_domain[flow]=[gateway_link[jsondata['in_switch']],gateway_link[jsondata['out_switch']],path,0]"
                         print "self.help_other_domain[",flow,"]=[" ,gateway_link[jsondata['in_switch']], ", ",gateway_link[jsondata['out_switch']], ",path,0]"
                         self.help_other_domain[flow]=[gateway_link[jsondata['in_switch']],gateway_link[jsondata['out_switch']],path,0]
-                        self.weight_flow[flow]= int(jsondata['max_token'])-2
+                        flow_info.flow_priority[flow] = int(jsondata['max_token'])-2
         elif jsondata['command'] == 'Help_Reply' :
             if jsondata['Domain'] == switch_domain[CONF.ofp_tcp_listen_port] :
                 print "-------------------"
@@ -163,25 +161,13 @@ class Controller_Communication(app_manager.RyuApp):
         elif jsondata['command']=='Congestion_Notify':
             if jsondata['Domain'] == switch_domain[CONF.ofp_tcp_listen_port] and (flow) in self.flow_gateway.keys():
                 bw=jsondata['help_bw']
-                
-                for flow,info in flow_info.iperf_flow_info.iteritems():
-                    if info["src_ip"] == flow[0] and info["dst_ip"] == flow[1]:# flow find
-                        org_bw = self.normalize_to_mbps(info["bw"])
-                        out_ratio = (1 if bw/org_bw > 1 else bw/org_bw) * 100
-                        self.grouptable[flow]=[out_ratio,100-out_ratio,0] # out_ratio(out of 100), in_ratio, help count
-                        print "flow", flow, "Split: ", self.grouptable[flow]
-                        # out_ratio: the percentage of bandwidth help_domain can help
-                        # in_bw: the  percentage of bandwidth orginal domain needs to handle
-                        # self.grouptable[flow]=[bw*10,100-bw*10,0] # org code
-                        break
-
-                print "recv_congetsion :", flow
-                if flow == ('10.0.0.1','10.0.0.3'):
-                    pass
-                    # self.grouptable[flow]=[40,60,0]
-                    
-                if flow == ('10.0.0.4','10.0.0.2'):
-                    self.grouptable[flow]=[]
+                org_bw = flow_info.flow_bw[flow]
+                out_ratio = (1 if bw/org_bw > 1 else bw/org_bw) * 100
+                self.grouptable[flow]=[round(out_ratio,4),round(100-out_ratio,4),0] # out_ratio(out of 100), in_ratio, help count
+                print "flow", flow, "Split: ", self.grouptable[flow]
+                # out_ratio: the percentage of bandwidth help_domain can help
+                # in_bw: the  percentage of bandwidth orginal domain needs to handle
+                # self.grouptable[flow]=[bw*10,100-bw*10,0] # org code
 
     def send_can_help(self,data_json):
         data_json_out=json.dumps({"command":"Help_Reply",

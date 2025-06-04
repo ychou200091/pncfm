@@ -30,7 +30,7 @@ from ryu.lib.packet import ipv4
 from ryu.lib.packet import arp
 from time import sleep, ctime
 from time import time as current_time
-import time
+import time, random
 from ryu.topology import event, switches
 from ryu.topology.api import get_switch, get_link
 
@@ -73,10 +73,7 @@ class ShortestForwarding(app_manager.RyuApp):
         self.network_commun = kwargs["network_commun"]
         self.datapaths = {}
         self.weight = self.WEIGHT_MODEL[CONF.weight]
-        self.metertable={}
-        #self.grouptable={}
-        #self.metertable[('10.0.0.2','10.0.0.1')]=4
-        #self.metertable[('10.0.0.1','10.0.0.2')]=5
+        
         self.weight_flow={}
         self.flow_size={}
         self.weight_flow[('10.0.0.2','10.0.0.4')]=3
@@ -129,24 +126,59 @@ class ShortestForwarding(app_manager.RyuApp):
                 self.logger.debug('unregister datapath: %016x', datapath.id)
                 del self.datapaths[datapath.id]
 
-    def add_flow(self, dp, p, match, actions, idle_timeout=0, hard_timeout=0,use_meter=False):
+    def add_flow(self, dp, p, match, actions, idle_timeout=0, hard_timeout=0,use_meter=False, dst_port=None):
         """
             Send a flow entry to datapath.
         """
         ofproto = dp.ofproto
         parser = dp.ofproto_parser
-
-        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS,
-                                             actions)]
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
         if use_meter:
-            inst.append(parser.OFPInstructionMeter(self.metertable[(match['ipv4_src'],match['ipv4_dst'])],ofproto.OFPIT_METER))
-            #print "use_meter :",inst
+            flow = (match['ipv4_src'],match['ipv4_dst'])
+            if flow in self.monitor.metertable.keys():
+                if dp.id == self.monitor.metertable[flow]["dpid"] and dst_port == self.monitor.metertable[flow]["outport"]:
+                    # add rate limit 
+                    if "meter_id" in self.monitor.metertable[flow].keys():
+                        # don't add new rate limit, use old limit
+                        meter_id = self.monitor.metertable[flow]["meter_id"]
+                    else:
+                        # get new meter id and install rate limit
+                        ids = [v["meter_id"] for v in self.monitor.metertable.itervalues() if "meter_id" in v]  
+                        meter_id = self.get_unique_num100(ids)
+                        rate_mbps = self.monitor.metertable[flow]["rate"]
+                        self.monitor.metertable[flow]["meter_id"] = meter_id
+                        self.add_meter_entry(dp,meter_id,rate_mbps)
+                    print("[Add_meter_entry] meter_id:",self.monitor.metertable[flow]["meter_id"],"rate: ",self.monitor.metertable[flow]["rate"], "flow: ", flow, "dpid-port",(dp.id,dst_port) )                        
+                    inst.append(parser.OFPInstructionMeter(meter_id,ofproto.OFPIT_METER))
 
         mod = parser.OFPFlowMod(datapath=dp, priority=p,
                                 idle_timeout=idle_timeout,
                                 hard_timeout=hard_timeout,
                                 match=match, instructions=inst)
         dp.send_msg(mod)
+    
+    def add_meter_entry(self, dp, meter_id, rate_mbps):
+        ofproto = dp.ofproto
+        parser = dp.ofproto_parser
+
+        rate_kbps = int(rate_mbps * 1000)  # convert float Mbps to kbps
+        burst_size = rate_kbps  # simple burst setting
+
+        bands = [parser.OFPMeterBandDrop(rate=rate_kbps, burst_size=burst_size)]
+        meter_mod = parser.OFPMeterMod(
+            datapath=dp,
+            command=ofproto.OFPMC_ADD,
+            flags=ofproto.OFPMF_KBPS,
+            meter_id=meter_id,
+            bands=bands)
+        dp.send_msg(meter_mod)
+
+    def get_unique_num100(self,ids) :
+        mid = random.randint(0,100)
+        while mid in ids:
+            mid = random.randint(0,100)
+        return mid
+
     def send_group_Table_add(self,datapath_id,flow_info,id_num=5):
         datapath=self.datapaths[datapath_id]
         ofp = datapath.ofproto
@@ -196,6 +228,7 @@ class ShortestForwarding(app_manager.RyuApp):
                                 idle_timeout=2,flags=ofp.OFPFF_SEND_FLOW_REM,
                                 match=match, instructions=inst)
         datapath.send_msg(mod)
+    
     def send_flow_mod(self, datapath, flow_info, src_port, dst_port):
         """
             Build flow entry, and send it to datapath.
@@ -207,11 +240,11 @@ class ShortestForwarding(app_manager.RyuApp):
         match = parser.OFPMatch(
             in_port=src_port, eth_type=flow_info[0],
             ipv4_src=flow_info[1], ipv4_dst=flow_info[2])
-        #print " flow : ", (flow_info[1],flow_info[2]) ,"   one ::>>",(flow_info[1],flow_info[2]) in self.metertable.keys()," two:>> ",(flow_info[1],flow_info[2]) in self.network_commun.help_other_domain.keys()
-        if (flow_info[1],flow_info[2]) in self.metertable.keys() :#and (flow_info[1],flow_info[2]) in self.network_commun.help_other_domain.keys():
-                print "add_meter_table! dpid:",datapath.id,"  ",flow_info,",limit:",self.metertable[(flow_info[1], flow_info[2])]
-                self.add_flow(datapath, 1, match, actions,idle_timeout=5, hard_timeout=5,use_meter=True)
-                #self.metertable[(flow_info[1],flow_info[2])][1]=1
+        
+        flow = (flow_info[1],flow_info[2]) 
+        if flow in self.monitor.metertable.keys():
+            # print "add_meter_table! dpid:",datapath.id,"dst_port:",dst_port,"flow: ",flow_info,",limit:", self.monitor.metertable[flow]["rate"]
+            self.add_flow(datapath, 1, match, actions,idle_timeout=5, hard_timeout=5,use_meter=True, dst_port=dst_port)
         else:
             self.add_flow(datapath, 1, match, actions,idle_timeout=1, hard_timeout=5)
 
@@ -347,6 +380,7 @@ class ShortestForwarding(app_manager.RyuApp):
                 paths = result[1]
                 best_path = paths.get(src).get(dst)['bw']
                 return best_path
+    
     def get_sw(self, dpid, in_port, src, dst):
         """
             Get pair of source and destination switches.
@@ -443,7 +477,6 @@ class ShortestForwarding(app_manager.RyuApp):
             self.send_flow_mod(first_dp, back_info, out_port, in_port)
             self.send_packet_out(first_dp, buffer_id, in_port, out_port, data)
 
-
     def shortest_forwarding(self, msg, eth_type, ip_src, ip_dst):
         """
             To calculate shortest forwarding path and install them into datapaths.
@@ -482,6 +515,7 @@ class ShortestForwarding(app_manager.RyuApp):
     def alter_path_one(self, msg, eth_type, ip_src, ip_dst):
         """
             To calculate shortest forwarding path and install them into datapaths.
+            Send flow to other domains
         """
         datapath = msg.datapath
         ofproto = datapath.ofproto
@@ -536,7 +570,6 @@ class ShortestForwarding(app_manager.RyuApp):
                 if self.network_commun.grouptable[(ip_src,ip_dst)][2]==0 :
                     self.send_group_Table_add(1,flow_info,6)
                 self.send_group_mod(1,flow_info,6)#dead
-            
         return
 
     def alter_path_two(self, msg, eth_type, ip_src, ip_dst):
@@ -619,16 +652,18 @@ class ShortestForwarding(app_manager.RyuApp):
             path,have_higher_bw=self.get_new_path_help(path[0],path[-1],self.flow_size[(ip_src,ip_dst)])
             #change the table path
             if have_higher_bw is False or self.network_commun.help_other_domain[(ip_src,ip_dst)][3]>=1: #second chance or not have_higher_bw
-                print("notify the domain!!!!!!", "have_higher_bw:",have_higher_bw, "flow help count: ", self.network_commun.help_other_domain[(ip_src,ip_dst)][3] )
-                if (ip_src,ip_dst) not in self.metertable.keys():
+                print "[Do_help]", "not have_higher_bw", "flow help count: ", self.network_commun.help_other_domain[(ip_src,ip_dst)][3] 
+                
+                if (ip_src,ip_dst) not in self.monitor.metertable.keys(): # have not limit rates yet, limit rate based on weights
+                    
                     other_domain_flow_token=self.network_commun.weight_flow[(ip_src,ip_dst)]
                     my_domain_flow_token=self.weight_flow[('10.0.0.5','10.0.0.6')]
-                    self.metertable[(ip_src,ip_dst)]=int(float(other_domain_flow_token)/(int(other_domain_flow_token)+int(my_domain_flow_token))*10)
-                    self.metertable[('10.0.0.5','10.0.0.6')]=int(float(my_domain_flow_token)/(int(other_domain_flow_token)+int(my_domain_flow_token))*10)
-                    print 'Y_Y :','10.0.0.5','10.0.0.6',self.metertable[('10.0.0.5','10.0.0.6')]
-                    print "flow:",(ip_src,ip_dst), ", rate limit: ",self.metertable[(ip_src,ip_dst)]
-                    self.network_commun.send_congestion(ip_src,ip_dst,help_bw=self.metertable[(ip_src,ip_dst)])#dead
-                    #self.metertable[(ip_src,ip_dst)]=[4,0]
+                    self.monitor.metertable[(ip_src,ip_dst)]=int(float(other_domain_flow_token)/(int(other_domain_flow_token)+int(my_domain_flow_token))*10)
+                    self.monitor.metertable[('10.0.0.5','10.0.0.6')]=int(float(my_domain_flow_token)/(int(other_domain_flow_token)+int(my_domain_flow_token))*10)
+                    print 'Y_Y :','10.0.0.5','10.0.0.6',self.monitor.metertable[('10.0.0.5','10.0.0.6')]
+                    print "flow:",(ip_src,ip_dst), ", rate limit: ",self.monitor.metertable[(ip_src,ip_dst)]
+                    self.network_commun.send_congestion(ip_src,ip_dst,help_bw=self.monitor.metertable[(ip_src,ip_dst)])#dead
+                    
             elif self.network_commun.help_other_domain[(ip_src,ip_dst)][3]==0:
                 self.network_commun.help_other_domain[(ip_src,ip_dst)][3]=self.network_commun.help_other_domain[(ip_src,ip_dst)][3]+1
                 #self.monitor.warning_flow_table.pop((ip_src,ip_dst))

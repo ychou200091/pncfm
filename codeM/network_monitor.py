@@ -31,10 +31,13 @@ import setting
 import random
 from numpy import array
 import time
-from flow_info import *
+import flow_info
+
 CONF = cfg.CONF
 host_loc={(5,4),(6,4),(11,5),(12,3),(7,3),(7,4),(8,4),(6,3),(9,3),(11,4),(10,4),(9,4)}
 out_door={13:2,4:4,14:1,7:3,14:1}
+ip_out_door={'10.0.0.3':4,'10.0.0.4':4,'10.0.0.1':13,'10.0.0.2':13}
+
 ip_domain={'10.0.0.1':1,'10.0.0.2':1,'10.0.0.3':1,'10.0.0.4':1,'10.0.0.5':2,'10.0.0.6':2,'10.0.0.7':3,'10.0.0.8':3,'10.0.0.9':2,'10.0.0.10':2}
 switch_domain={6633:1,6634:2,6635:3}
 class NetworkMonitor(app_manager.RyuApp):
@@ -71,6 +74,8 @@ class NetworkMonitor(app_manager.RyuApp):
         # free bandwidth of links respectively.
         self.monitor_thread = hub.spawn(self._monitor)
         self.save_freebandwidth_thread = hub.spawn(self._save_bw_graph)
+        self.metertable = {} # metertable: key is flow(src_ip,dst_ip), value is a dictionary of "dpid","outport","rate", "timestamp", "meter_id"
+
 	
    # detects when a swtich connect or disconnect to the controller
     @set_ev_cls(ofp_event.EventOFPStateChange,
@@ -448,8 +453,6 @@ class NetworkMonitor(app_manager.RyuApp):
                return True
         return False
 
-    
-
     def set_load_weight(self,flow): # flag paths to flow_change_table
         #if flow in self.communication.help_other_domain:#if change one times the dpid will leave the old rule
         #    return
@@ -473,12 +476,6 @@ class NetworkMonitor(app_manager.RyuApp):
                             self.flow_change_table[key2]=list() 
                             self.flow_change_table[key2].append((key[0]))
                         print "On link",link,", add flow",key[0], "to flow_change_table"
-    def set_load_weight2(self,flow):
-        pass
-        '''
-        if flow change table has a congested flow, it checks if its path encounters multiple flows, if so, it adds them to flow change table as well, so controller can select what to route.
-        '''
-
 
     def select_the_warningflow(self,flow_change_list):
         tmp=list(set(flow_change_list).intersection(set(self.communication.help_other_domain.keys())))#if help other warning should selete it
@@ -499,8 +496,8 @@ class NetworkMonitor(app_manager.RyuApp):
             highest_prioirty_flow = None
             highest_prioirty= -1
             for flow in flow_change_list:
-                if flow_priority[flow]> highest_prioirty:
-                    highest_prioirty = flow_priority[flow]
+                if flow_info.flow_priority[flow]> highest_prioirty:
+                    highest_prioirty = flow_info.flow_priority[flow]
                     highest_prioirty_flow = flow
             
             # else:
@@ -508,9 +505,6 @@ class NetworkMonitor(app_manager.RyuApp):
             #     flow=flow_change_list[k]
             print "select_the_warningflow, flow: ", highest_prioirty_flow
             return highest_prioirty_flow
-            
-
-
 
     def set_warning_flow(self):
         
@@ -570,18 +564,121 @@ class NetworkMonitor(app_manager.RyuApp):
                         self.freeload_table[key[1],self.awareness.link_to_port[key][1]]=1
 
     def deal_warning_flow(self):
-        for item in self.warning_flow_table:
-            if item in self.communication.help_list.keys():
-                continue
-            if item in self.help_other_domain.keys():
-                if self.help_other_domain[item][3]>0: # helped already don't trigger again
-                    continue
+        pop_flow = []
+        for flow in self.warning_flow_table:
+            print "[deal_warning_flow]" , flow
+            if  flow in self.communication.help_other_domain.keys():
+                # 1.deal with help other domain situation
+                self.deal_warning_flow_help_other_domain(flow,pop_flow)
+            elif flow not in self.communication.help_list.keys() or (flow in self.communication.help_list.keys() and time.time()>self.network_commun.help_list[flow][0]+self.communication.help_list[flow][1]):
+                # 2. help_list situation: flow is going out
+                # Reroute to a different domain to lift congestion
+                print "Congested Flow: ",flow, "Ask for help"
+                self.communication.send_help(ip_out_door[flow[0]],ip_out_door[flow[1]],flow[0],flow[1],flow_info.flow_bw[flow],flow_info.flow_priority[flow])
+                self.delete_flows_by_ip_pair(flow[0],flow[1])
+                
+            else:
+                # Reroute to a different domain done, still congested.
+                # limit rate of flows on congested links. Not supported yet
+                pass
+        for flow in pop_flow:
+            print "warning flow pop_flow:", flow
+            self.warning_flow_table.pop(flow)
 
-            print "warning flow table item: ", item
-            src_ip = item[0]
-            dst_ip = item[1]
-            self.delete_flows_by_ip_pair(src_ip,dst_ip)
-            # del flows from switches to trigger them to ask controller.
+
+    def deal_warning_flow_help_other_domain(self,flow,pop_flow):
+
+        print( "warning_flow help other domain. Flow: ",flow)
+        try:
+            # 1. Find a diff path if available.
+            have_higher_bw = False
+            path = self.communication.help_other_domain[flow][2]
+            org_path = path
+
+            path,have_higher_bw=self.get_new_path_help(path[0],path[-1], flow_info.flow_bw[flow])
+            print "self.communication.help_other_domain[flow][3]: ",  self.communication.help_other_domain[flow][3]
+            if have_higher_bw and self.communication.help_other_domain[flow][3] < 1:
+                # assgin to a new path
+                # delete flow from switches to trigger do_help function in shortest_forwarding.py
+                print "delete_flows_by_ip_pair ", flow
+                self.delete_flows_by_ip_pair(flow[0],flow[1])
+                '''
+                self.communication.help_other_domain[flow][3]=self.communication.help_other_domain[flow][3]+1 # help count ++
+                self.communication.help_other_domain[flow][2]=path
+                self.warning_flow_table.pop(flow)
+                print("Change help path:[org_path] ", org_path, " -->[New Path] ",path)
+                '''
+            else:
+                # 2. Diff path not available. limit rate 
+                print("not have_higher_bw, flow: ",flow)
+                # metertable: key: flow(src_ip,dst_ip), 
+                #             value: a dictionary of "dpid","outport","rate", "timestamp"
+                        
+                if flow not in self.metertable.keys():  # have not limit rates yet, limit rate based on weight
+                    congestedflows,dpdp = self.find_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+                    # calculate sum of weight and find portion bw the foreign flow should use.
+                    sum_weight = 0
+                    for cflow in congestedflows:
+                        # print cflow
+                        # print flow_info.flow_priority[cflow] 
+                        sum_weight = sum_weight + flow_info.flow_priority[cflow] 
+                    #sum_weight = sum([flow_info.flow_priority[cflow] for cflow in congestedflows])
+                    print "sum_weight:",sum_weight
+                    
+                    for cflow in congestedflows:   
+                    
+                        self.metertable[cflow] = {}
+                        self.metertable[cflow]["dpid"]= dpdp[0]
+                        self.metertable[cflow]["outport"] = self.awareness.link_to_port[dpdp][0]
+                        self.metertable[cflow]["rate"]= round(float(flow_info.flow_priority[cflow])/(sum_weight)*10 , 4 )
+                        self.metertable[cflow]["timestamp"] = time.time()
+                        print ("Flow:", cflow, "Weight:",flow_info.flow_priority[cflow],"dp-outp",(self.metertable[cflow]["dpid"],self.metertable[cflow]["outport"]) ,"RateLimit:",self.metertable[cflow]["rate"])
+                    
+                    self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+                    
+                    pop_flow.append(flow)
+                    #self.metertable[(ip_src,ip_dst)]=[4,0]
+                    # FPLM Method
+                    # flow_on_CongestLink_pbw_dict= 
+                    # fplm.fplm_calculate_bw_alloc( setting.MAX_CAPACITY, flow_on_CongestLink_pbw_dict )
+        except Exception as e:
+            print "Exception:" , e
+    
+    def find_congestedlink_flows_and_dpdp(self, flow, flow_change_table):
+        # find_congestedlink_flows_and_dpdp
+        target_dpdp = None
+        count = -1
+        for dpdp in flow_change_table.keys():
+            
+            if flow in flow_change_table[dpdp]:
+                if len(flow_change_table[dpdp])> count:
+                    count = len(flow_change_table[dpdp])
+                    target_dpdp = dpdp
+
+        print "target_dpdp: ",target_dpdp, "flows: ", flow_change_table[target_dpdp]
+        return   flow_change_table[target_dpdp],target_dpdp 
+    
+    def get_new_path_help(self,in_switch,out_switch,leatest_bw):
+        shortest_paths = self.awareness.shortest_paths
+        graph = self.graph
+        paths= shortest_paths[in_switch][out_switch]['hop']# switch path
+        
+        best_path=None
+        max_bw=0
+        path_bw=0
+        for i in range(len(paths)):
+            path_bw=self.get_min_bw_of_links(graph,paths[i],setting.MAX_CAPACITY)
+            print "path: ",paths[i]," bw= ",path_bw
+            if  path_bw>max_bw:#by hop
+                max_bw=path_bw
+                best_path=i
+        if max_bw>leatest_bw:
+            print "max_bw :",max_bw, "new path: ", paths[best_path]
+            return paths[best_path],True
+        else:
+            print "new path: ", paths[best_path], "max_bw :",max_bw
+            return paths[best_path],False
+        
     def delete_flows_by_ip_pair(self, src_ip, dst_ip):
         for dpid in self.datapaths:
             dp = self.datapaths[dpid]
@@ -606,7 +703,6 @@ class NetworkMonitor(app_manager.RyuApp):
             dp.send_msg(mod)
             self.logger.info("Sent delete command for flow %s -> %s on DPID %s" %
                             (src_ip, dst_ip, dpid))
-
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def _flow_stats_reply_handler(self, ev):
@@ -646,7 +742,6 @@ class NetworkMonitor(app_manager.RyuApp):
             speed = self._get_speed(self.flow_stats[dpid][key][-1][1],
                                     pre, period)
             self._save_stats(self.flow_speed[dpid], key, speed, 5)
-
 
     @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
     def _port_stats_reply_handler(self, ev):
@@ -850,6 +945,13 @@ class NetworkMonitor(app_manager.RyuApp):
             if self.warning_flow_table:
                 for key2 in self.warning_flow_table:
                     print "\t", key2,": ",self.warning_flow_table[key2]
+            print '-----\n'
+
+            
+            print "Metertable: "
+            if self.metertable:
+                for key2 in self.metertable:
+                    print "\t", key2,": ",self.metertable[key2]
             print '-----\n'
             print "=======================\n"
 
