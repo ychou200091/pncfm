@@ -44,9 +44,7 @@ Outputs:
 3.4 graph_total_throughput.png + graph_total_throughput.csv
     → Total throughput of the entire network over time.
 '''
-file_root =  "/home/admin123/Desktop/grad/env/codeM/log/CHFM/"
-# file_root =  "/home/admin123/Desktop/grad/env/codeM/log/CFM_org/"
-
+from flow_info import * 
 # List of input files to process
 input_files = [
     "1_3.out",
@@ -54,12 +52,20 @@ input_files = [
     "5_6.out",
     "9_10.out",
 ]
+
 file_list = {
-    "1_3.csv": {"name": "Flow 1_3", "start_time": 0},
-    "2_4.csv": {"name": "Flow 2_4", "start_time": 25},
-    "9_10.csv": {"name": "Flow 9_10", "start_time": 100},
-    "5_6.csv": {"name": "Flow 5_6", "start_time": 130}
+    "1_3.csv": {"name": "Flow 1_3", "start_time":  iperf_flow_info[("h1","h3")]["start_time"]},
+    "2_4.csv": {"name": "Flow 2_4", "start_time":  iperf_flow_info[("h2","h4")]["start_time"]},
+    "9_10.csv": {"name": "Flow 9_10", "start_time":  iperf_flow_info[("h9","h10")]["start_time"]},
+    "5_6.csv": {"name": "Flow 5_6", "start_time":  iperf_flow_info[("h5","h6")]["start_time"]}
 } 
+
+# file_list = {
+#     "1_3.csv": {"name": "Flow 1_3", "start_time": 5},
+#     "2_4.csv": {"name": "Flow 2_4", "start_time": 25},
+#     "9_10.csv": {"name": "Flow 9_10", "start_time": 10},
+#     "5_6.csv": {"name": "Flow 5_6", "start_time": 45}
+# } 
 
 def convert_to_mbytes(value, unit):
     """Convert KBytes or MBytes to MBytes"""

@@ -13,7 +13,7 @@ import time
 import os
 from mininet.term import makeTerms
 import log.real_bw as real_bw
-
+import flow_info
 
 
 def MininetTopo():
@@ -249,11 +249,8 @@ def MininetTopo():
             if t==260:
                 iperf_single( hosts=(h7,h4), udpBw='7M', period=225)
                 print 'h7 h4'''
-            if t%5 == 0:
-                # t2 = cur_time - simulation_start_time
-                # print "Time: ", t, "Time since program starts: ", t2
-                timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                print "Time : ", t, "Time: ", timestamp
+            
+            '''
             if t==15:
                 iperf_single( hosts=(h1,h3), udpBw='9m', period=300)
                 print 'h1 h3'
@@ -263,13 +260,27 @@ def MininetTopo():
                 print 'h9 h10'
                 real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h9-h10")
             if t==60:
-                iperf_single( hosts=(h2,h4), udpBw='6m', period=250)
+                iperf_single( hosts=(h2,h4), udpBw='6m', period=265)
                 print 'h2 h4'
                 real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h2-h4")
             if t==125:
                 iperf_single( hosts=(h5,h6), udpBw='6m', period=210)
                 print 'h5 h6'
                 real_bw.log_bandwidth(real_bw.prev_bytes, msg = "h5-h6")
+
+            '''
+            if t%5 == 0:
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                print "Time : ", t, "Time: ", timestamp
+
+            for flow in flow_info.iperf_flow_info.keys():
+                if t == flow["start_time"]:
+                    src = net.get(flow[0])
+                    dst = net.get(flow[1])
+                    iperf_single( hosts=(src,dst), udpBw=flow["bw"], period=flow["period"])
+                    print flow[0] + " " + flow[1]
+                    real_bw.log_bandwidth(real_bw.prev_bytes, msg = flow[0] + "-" + flow[1])
+
             sleep(1)
             if t==450:
                 break
@@ -298,23 +309,11 @@ def iperf_single(hosts=None, udpBw='10M', period=60, port=5001):
         "iperf -u -s -e -i -5 >> ./log/CHFM/1_3.out&"
         "iperf -u -c 10.0.0.1 -b 10M -i 5 -e -t 60 >> ./log/cleant1_3.out&"
         '''
-        #print "***start server***"
-        # server.cmd( iperfArgs + '-s -e -i 5 >> ./log/CHFM/' + filename + ' | ts& ')
-        server.cmd( iperfArgs +"-s -e -i 5 >./log/CHFM/"+filename+"&")
-        # server.cmd( iperfArgs +"-s -e -i 5 | ts >./log/CHFM/"+filename+"&") # add timestamp at the beginning of logs
-
-        # makeTerms([server], 'iperf -s -e -i 5 >> ./log/CFM/')
-         
-        # makeTerms([server], cmd='bash -c "iperf -s -e -i 5 >> ./log/CFM/; exec bash"')
-        # server.popen('xterm -e bash -c "'+ iperfArgs + '-s -e -i 5 >> ./log/CFM/' + filename +'; exec bash"')
-        # server.popen(iperfArgs + '-s -e -i 5 >> ./log/CHFM_org/' + filename +'; exec bash"')
-        #print "***start client***"
+        server.cmd( iperfArgs +"-s -e -i 5 >./log/"+flow_info.log_root+"/"+filename+"&")
         client.cmd(
             iperfArgs +' -c ' + server.IP() + ' ' + bwArgs
             +'-i 5'+ ' -e -t '+ str(period) +' >> ./log/' + 'client' + filename +'&')
-        #print (iperfArgs +' -c ' + server.IP() + ' ' + bwArgs
-        #    +'-i 5'+ '-t '+ str(period) +' > ./log/' + 'client' + filename +'&')
-
+        
 def test_pingall_with_retries(net, retries=3, delay=2):
     for attempt in range(1, retries + 1):
         print("\n[INFO] Attempt ",attempt, " of ",retries," - Running pingAll...")
@@ -329,21 +328,7 @@ def test_pingall_with_retries(net, retries=3, delay=2):
     print("[ERROR] pingAll failed after multiple retries. Stopping simulation.")
     return False
 
-def apply_tbf_fifo(net, rate="10mbit", burst="15000", latency="12ms", pfifo_limit=1000):
-    print("\n=== Applying TBF + FIFO ===")
-    for sw in net.switches:
-        intfs = sw.intfList()
-        for intf in intfs:
-            if not intf.name.startswith("lo"):
-                # Delete org qdisc
-                os.system("sudo tc qdisc del dev {} root".format(intf.name))
-                # add TBF
-                os.system("sudo tc qdisc add dev {} root handle 1: tbf rate {} burst {} latency {}".format(
-                    intf.name, rate, burst, latency))
-                #add fifo pfifo
-                #os.system("sudo tc qdisc add dev {} parent 1:1 handle 10: sfq limit {}".format(intf.name, pfifo_limit))
-                print("Applied TBF to {}".format(intf.name))
-    print("=== Done ===\n")
+def pick_mn_host(flow[0])
 
 if __name__ == '__main__':
     setLogLevel('info')
