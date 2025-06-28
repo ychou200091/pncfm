@@ -148,6 +148,8 @@ class Controller_Communication(app_manager.RyuApp):
                         print "self.help_other_domain[",flow,"]=[" ,gateway_link[jsondata['in_switch']], ", ",gateway_link[jsondata['out_switch']], ",path,0]"
                         self.help_other_domain[flow]=[gateway_link[jsondata['in_switch']],gateway_link[jsondata['out_switch']],path,0]
                         flow_info.flow_priority[flow] = int(jsondata['max_token'])-2
+                        flow_info.flow_profit[flow] = round(int(jsondata['max_token']) * 0.7, 4)
+                        
         elif jsondata['command'] == 'Help_Reply' :
             if jsondata['Domain'] == switch_domain[CONF.ofp_tcp_listen_port] :
                 print "-------------------"
@@ -193,7 +195,7 @@ class Controller_Communication(app_manager.RyuApp):
         print "mes: ",mes
         self.server_push_socket.send_string(mes)
 
-    send_help_count = 0
+    
     def send_help(self,in_switch,out_switch,src_ip,dis_ip,max_bw,max_token):
         '''ask for help'''
         print "==========================="
@@ -201,7 +203,6 @@ class Controller_Communication(app_manager.RyuApp):
         print ("network_commun.send_help() triggered, in_switch:", in_switch, "out_switch:", out_switch, "src_ip:", src_ip, "dst_ip:", dis_ip, "max_bw:", max_bw, "max_token:", max_token)
         print "[send help]"
         print "==========================="
-        self.send_help_count += 1
 
         if((src_ip,dis_ip) not in self.help_list.keys()):
             self.help_list.setdefault((src_ip,dis_ip),[1,time()])

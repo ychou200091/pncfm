@@ -31,7 +31,7 @@ import setting
 import random
 from numpy import array
 import time
-import flow_info
+from algorithms import flow_info
 
 CONF = cfg.CONF
 host_loc={(5,4),(6,4),(11,5),(12,3),(7,3),(7,4),(8,4),(6,3),(9,3),(11,4),(10,4),(9,4)}
@@ -493,18 +493,18 @@ class NetworkMonitor(app_manager.RyuApp):
             print "select_the_warningflow, random flow: ", flow
             return tmp[k]
         else:
-            highest_prioirty_flow = None
-            highest_prioirty= -1
+            highest_profit_flows = []
+            highest_profit = -1
             for flow in flow_change_list:
-                if flow_info.flow_priority[flow]> highest_prioirty:
-                    highest_prioirty = flow_info.flow_priority[flow]
-                    highest_prioirty_flow = flow
+                if flow_info.flow_profit[flow] > highest_profit:
+                    highest_profit = flow_info.highest_profit[flow]
+                    highest_profit_flows = [flow]
+                elif flow_info.flow_profit[flow] == highest_profit:
+                    highest_profit_flows.append(flow)
+            selected = random.choice(highest_profit_flows)
             
-            # else:
-            #     k=random.randint(0,len(flow_change_list)-1)
-            #     flow=flow_change_list[k]
-            print "select_the_warningflow, flow: ", highest_prioirty_flow
-            return highest_prioirty_flow
+            print "select_the_warningflow, flow: ", selected
+            return selected
 
     def set_warning_flow(self):
         
@@ -574,13 +574,14 @@ class NetworkMonitor(app_manager.RyuApp):
                 # 2. help_list situation: flow is going out
                 # Reroute to a different domain to lift congestion
                 print "Congested Flow: ",flow, "Ask for help"
-                self.communication.send_help(ip_out_door[flow[0]],ip_out_door[flow[1]],flow[0],flow[1],flow_info.flow_bw[flow],flow_info.flow_priority[flow])
+                self.communication.send_help(ip_out_door[flow[0]],ip_out_door[flow[1]],flow[0],flow[1],flow_info.flow_bw[flow],flow_info.flow_profit[flow])
                 self.delete_flows_by_ip_pair(flow[0],flow[1])
                 
             else:
                 # Reroute to a different domain done, still congested.
                 # limit rate of flows on congested links. Not supported yet
-                pass
+                self.process_limit_rate(flow,pop_flow)
+                
         for flow in pop_flow:
             print "warning flow pop_flow:", flow
             self.warning_flow_table.pop(flow)
@@ -611,39 +612,30 @@ class NetworkMonitor(app_manager.RyuApp):
             else:
                 # 2. Diff path not available. limit rate 
                 print("not have_higher_bw, flow: ",flow)
-                # metertable: key: flow(src_ip,dst_ip), 
-                #             value: a dictionary of "dpid","outport","rate", "timestamp"
-                        
-                if flow not in self.metertable.keys():  # have not limit rates yet, limit rate based on weight
-                    congestedflows,dpdp = self.find_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
-                    # calculate sum of weight and find portion bw the foreign flow should use.
-                    sum_weight = 0
-                    for cflow in congestedflows:
-                        # print cflow
-                        # print flow_info.flow_priority[cflow] 
-                        sum_weight = sum_weight + flow_info.flow_priority[cflow] 
-                    #sum_weight = sum([flow_info.flow_priority[cflow] for cflow in congestedflows])
-                    print "sum_weight:",sum_weight
+                self.process_limit_rate(flow,pop_flow)
+                
                     
-                    for cflow in congestedflows:   
-                    
-                        self.metertable[cflow] = {}
-                        self.metertable[cflow]["dpid"]= dpdp[0]
-                        self.metertable[cflow]["outport"] = self.awareness.link_to_port[dpdp][0]
-                        self.metertable[cflow]["rate"]= round(float(flow_info.flow_priority[cflow])/(sum_weight)*10 , 4 )
-                        self.metertable[cflow]["timestamp"] = time.time()
-                        print ("Flow:", cflow, "Weight:",flow_info.flow_priority[cflow],"dp-outp",(self.metertable[cflow]["dpid"],self.metertable[cflow]["outport"]) ,"RateLimit:",self.metertable[cflow]["rate"])
-                    
-                    self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
-                    
-                    pop_flow.append(flow)
-                    #self.metertable[(ip_src,ip_dst)]=[4,0]
-                    # FPLM Method
-                    # flow_on_CongestLink_pbw_dict= 
-                    # fplm.fplm_calculate_bw_alloc( setting.MAX_CAPACITY, flow_on_CongestLink_pbw_dict )
         except Exception as e:
             print "Exception:" , e
-    
+    def process_limit_rate(self, flow, pop_flow):
+        # metertable: key: flow(src_ip,dst_ip), 
+        #             value: a dictionary of "dpid","outport",dpid2","outport2","rate", "timestamp","meter_id","meter_id2"
+        
+        congestedflows,dpdp = self.find_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+        # self.set_meter_limit_with_prioity(congestedflows,dpdp) # org code, use porptional priority
+        flow_bw_profit_dict = self.build_flow_bw_profit_dict(flow_info.flow_profit,flow_info.flow_bw, congestedflows)
+        new_flow_bws = fplm.fplm_calculate_bw_alloc( 10 , flow_bw_profit_dict)
+        print "Newly cal new_flow_bws: ",new_flow_bws
+        if flow not in self.metertable.keys():  # have not limit rates yet, limit rate based on weight
+            self.set_meter_limit(new_flow_bws,dpdp)
+            self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+        else: 
+            diff_precent = abs(self.metertable[flow]["rate"] - new_flow_bws[flow]) / self.metertable[flow]["rate"]
+            if diff_precent > 0.20: # difference high enough, update rate limit
+                self.set_meter_limit(new_flow_bws,dpdp)
+                self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+        pop_flow.append(flow)
+
     def find_congestedlink_flows_and_dpdp(self, flow, flow_change_table):
         # find_congestedlink_flows_and_dpdp
         target_dpdp = None
@@ -658,6 +650,45 @@ class NetworkMonitor(app_manager.RyuApp):
         print "target_dpdp: ",target_dpdp, "flows: ", flow_change_table[target_dpdp]
         return   flow_change_table[target_dpdp],target_dpdp 
     
+    def set_meter_limit(self, flow_meters, dpdp):
+        
+        for flow in flow_meters.keys():   
+            self.metertable[flow] = {}
+            self.metertable[flow]["dpid"]= dpdp[0]
+            self.metertable[flow]["outport"] = self.awareness.link_to_port[dpdp][0]
+            self.metertable[flow]["dpid2"]= dpdp[1] # reversed direction limit rate
+            self.metertable[flow]["outport2"] = self.awareness.link_to_port[dpdp][1]
+            self.metertable[flow]["rate"]= flow_meters[flow]
+            self.metertable[flow]["timestamp"] = time.time()
+            self.metertable[flow].pop('meter_id', None)
+            self.metertable[flow].pop('meter_id2', None)
+            print ("Flow:", flow, "Profit:",flow_info.flow_profit[flow],
+                   "dp-outp",(self.metertable[flow]["dpid"],self.metertable[flow]["outport"]) ,
+                   "reversed dp-outp", (self.metertable[flow]["dpid2"],self.metertable[flow]["outport2"]) ,
+                   "RateLimit:",self.metertable[flow]["rate"])
+            self.delete_flows_by_ip_pair(flow[0],flow[1]) # try to increase response time.
+            
+    # dead
+    def set_meter_limit_with_prioity(self, congestedflows, dpdp):
+        sum_weight = 0
+        for cflow in congestedflows:
+            sum_weight = sum_weight + flow_info.flow_priority[cflow] 
+        print "sum_weight:",sum_weight
+        flow_meters ={}
+        for cflow in congestedflows:   
+            flow_meters[cflow] = round(float(flow_info.flow_priority[cflow])/(sum_weight)*10 , 4 )
+        self.set_meter_limit(flow_meters, dpdp)
+            
+
+    def build_flow_bw_profit_dict(self, flow_profits, flow_bws, target_flows):
+        result = {}
+        for flow in target_flows:
+            bw = flow_bws[flow]
+            if flow in self.communication.grouptable.keys(): # split flow, only limit rate to the amount still in domain.
+                bw = round(bw * self.communication.grouptable[flow][1] / 100 , 4 )# in_ratio
+            result[flow] = { "bw":bw, "profit": flow_profits[flow]}
+        return result
+
     def get_new_path_help(self,in_switch,out_switch,leatest_bw):
         shortest_paths = self.awareness.shortest_paths
         graph = self.graph
