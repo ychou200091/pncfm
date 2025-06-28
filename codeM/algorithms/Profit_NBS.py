@@ -18,17 +18,22 @@ def v_B(x, d_A, d_B, p_A, p_B, s, c):
     s: domain A flow profit slice (portion of profit welling to give to domain B)
     c: link capacity
     '''
-    num = min((c-x),d_B)/d_B + s* p_A*x/p_B/d_A
-    return (num -1) 
+    x = c-d_B if c-x > d_B else x
+    num = (c-x)/d_B + s*p_A*x/p_B/d_A
+    return num - 1.0
 
 
 def nbs_obj( x, d_A, d_B, p_A, p_B, s, c):
-    if x < 0 or x > min(c, d_A):
+    if x < 0.0 or x > min(c, d_A):
         return float('-inf')
     
-    return  -1* v_A(x, d_A) * v_B(x, d_A, d_B, p_A, p_B, s, c)
+    return  -1.0* v_A(x, d_A) * v_B(x, d_A, d_B, p_A, p_B, s, c)
 
 def maximize_nbs(d_A, d_B, p_A, p_B, s, c):
+    # print("==========================")
+    # print("NBS:")
+    # print("d_A=%s, d_B=%s, p_A=%s, p_B=%s, s=%s, c=%s" % (d_A, d_B, p_A, p_B, s, c))
+
     '''
     parameteres:
     x: possible bw allocation to domain A
@@ -42,10 +47,12 @@ def maximize_nbs(d_A, d_B, p_A, p_B, s, c):
     """Find the x that maximizes the Nash product using scipy."""
     res = minimize_scalar(
         lambda x: nbs_obj(x, d_A, d_B, p_A, p_B, s,c),
-        bounds=(0, min(c, d_A)),
+        bounds=(0.0, min(c, d_A)),
         method='bounded'
     )
+    # print("result: %.4f" %res.x)
+    # print("==========================")
     if res.success:
-        return res.x, -res.fun
+        return round(res.x,6), -res.fun
     else:
         return 0.0, float('-inf')

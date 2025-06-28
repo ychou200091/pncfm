@@ -2,6 +2,8 @@ import numpy as np
 from scipy.optimize import minimize
 
 def profit_maximize_with_ungivenbw_penalty(flows, capacity=10.0):
+    # print ("Inside profit_maximize_with_ungivenbw_penalty")
+    # print ("processing flows:",flows )
     ids = sorted(flows.keys())
     N = len(ids)
     d = np.array([flows[i]['bw'] for i in ids])
@@ -30,7 +32,7 @@ def profit_maximize_with_ungivenbw_penalty(flows, capacity=10.0):
     profit_gained = P * (x / d)
     profit_lost = P - profit_gained
     percent_loss =  profit_lost / P
-
+    x = [round( i,6) for i in x]
     result = {
         "alloc": dict(zip(ids, x)),
         "gain": dict(zip(ids, profit_gained)),
