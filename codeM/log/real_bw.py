@@ -2,7 +2,7 @@ import time
 import csv
 import os
 
-INTERFACES = ['s1-eth1', 's1-eth3', 's3-eth2','s13-eth2','s7-eth1', 's7-eth2', 's5-eth1', 's6-eth2', 's6-eth4','s8-eth5','s8-eth6','s2-eth3', 's4-eth5','s4-eth6']
+INTERFACES = ['s1-eth1', 's1-eth3', 's3-eth2','s13-eth2','s7-eth1', 's7-eth2', 's5-eth1', 's6-eth2', 's6-eth4','s8-eth5','s8-eth6','s2-eth3', 's4-eth5','s4-eth6','s4-eth7']
 
 
 #INTERFACES = ['s1-eth1', 's1-eth3', 's3-eth2', 's2-eth3', 's4-eth5']
