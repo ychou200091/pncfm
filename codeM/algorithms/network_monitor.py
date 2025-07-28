@@ -553,23 +553,23 @@ class NetworkMonitor(app_manager.RyuApp):
             print "select_the_warningflow, random flow: ", flow
             return tmp[k]
         else:
-            # highest_prioirty_flow = []
-            # highest_prioirty= -1
-            # for flow in flow_change_list:
-            #     if flow_info.flow_priority[flow]> highest_prioirty:
-            #         highest_prioirty = flow_info.flow_priority[flow]
-            #         highest_prioirty_flow = flow
-            highest_profit_flows = []
-            highest_profit = -1
-            for flow in flow_change_list:
-                if flow_info.flow_profit[flow] > highest_profit:
-                    highest_profit = flow_info.flow_profit[flow]
-                    highest_profit_flows = [flow]
-                elif flow_info.flow_profit[flow] == highest_profit:
-                    highest_profit_flows.append(flow)
-            selected = random.choice(highest_profit_flows)
+            try:
+                highest_profit_flows = []
+                highest_profit = -1
+                for flow in flow_change_list:
+                    if flow not in flow_info.flow_profit.keys():
+                        flow_info.flow_profit[flow] = 0
+                    print "Flow:", flow, ", Profit:" , flow_info.flow_profit[flow]
+                    if flow_info.flow_profit[flow] > highest_profit:
+                        highest_profit = flow_info.flow_profit[flow]
+                        highest_profit_flows = [flow]
+                    elif flow_info.flow_profit[flow] == highest_profit:
+                        highest_profit_flows.append(flow)
+                selected = random.choice(highest_profit_flows)
+            except Exception as e:
+                print "exception: select_the_warningflow exception: ",e
             
-            print "select_the_warningflow, flow: ", selected
+            print "select the warning flow, flow: ", selected
             return selected
 
     def set_warning_flow(self):
@@ -651,13 +651,22 @@ class NetworkMonitor(app_manager.RyuApp):
                 # limit rate of flows on congested links. Not supported yet
                 print "=======================\n"
 
-                print "Best_paths:"
-                
-                shortest_paths = self.awareness.shortest_paths
-                print shortest_paths
-                print "=======================\n"
-                self.process_limit_rate(flow,pop_flow)
-                
+                    print "flow", flow, " in self.communication.help_list.keys()", "timeout happened, process limit rate"
+                    print "=======================\n"
+                    if CURRENT_MODE == 0:
+                        self.process_limit_rate(flow,pop_flow)
+                    elif CURRENT_MODE == 1:
+                        if flow in self.communication.grouptable.keys() : # split flow activated, don't limit rate
+                            if   self.communication.grouptable[flow]["in_ratio"] != 100:
+                                pop_flow.append(flow)
+                            continue
+                        self.process_limit_rate_by_profit_proportional(flow,pop_flow)
+                    elif CURRENT_MODE == 2: # CFM
+                        pass
+                    elif CURRENT_MODE == 3: # Nothing
+                        print "shortest_forwarding - deal warning flow - nothing"
+        except Exception as e:
+            print "deal_warning_flow exception: ", e      
         for flow in pop_flow:
             print "warning flow pop_flow:", flow
             self.warning_flow_table.pop(flow,None)
@@ -678,7 +687,8 @@ class NetworkMonitor(app_manager.RyuApp):
                 # assgin to a new path
                 # delete flow from switches to trigger do_help function in shortest_forwarding.py
                 print "delete_flows_by_ip_pair ", flow
-                self.delete_flows_by_ip_pair(flow[0],flow[1])
+                #self.delete_flows_by_ip_pair(flow[0],flow[1])
+                self.install_flow_to_new_path(path,flow)
                 '''
                 self.communication.help_other_domain[flow][3]=self.communication.help_other_domain[flow][3]+1 # help count ++
                 self.communication.help_other_domain[flow][2]=path
@@ -688,8 +698,26 @@ class NetworkMonitor(app_manager.RyuApp):
             else:
                 # 2. Diff path not available. limit rate 
                 print("not have_higher_bw, flow: ",flow)
-                self.nbs_bw_share(flow,pop_flow)
-                self.process_limit_rate(flow,pop_flow)   
+                
+                if CURRENT_MODE == 0: # 0:PNCFM, 1:MCRM, 2: CFM      
+                    self.nbs_bw_share(flow,pop_flow)
+                    self.process_limit_rate(flow,pop_flow)   
+                elif CURRENT_MODE == 1: # MCRM
+                    if flow in self.metertable.keys():
+                        old_meter = self.metertable[flow]["rate"]
+                    else:
+                        old_meter = flow_info.flow_bw[flow]
+                    self.process_limit_rate_by_profit_proportional(flow,pop_flow)
+                    if flow in self.metertable.keys():
+                        new_meter = self.metertable[flow]["rate"]
+                    else:
+                        new_meter = flow_info.flow_bw[flow]
+                    if abs(new_meter/old_meter - 1) > 0.1:
+                        self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+                elif CURRENT_MODE == 2: # CFM
+                    pass
+                elif CURRENT_MODE == 3: # Nothing
+                    print "shortest_forwarding - deal _help_other_domain - nothing"
 
         except Exception as e:
             print "Exception:" , e
@@ -707,9 +735,10 @@ class NetworkMonitor(app_manager.RyuApp):
             sum_bw = sum_bw + flow_info.flow_bw[f]
             sum_profit = sum_profit + flow_info.flow_profit[f]
         # print("sum_bw %d,sum_profit %d "%(sum_bw,sum_profit))
+        s = self.communication.help_other_domain[flow][4] # slice 
         assist_flow_bw = flow_info.flow_bw[flow]
         assist_flow_profit = flow_info.flow_profit[flow]
-        s = self.communication.help_other_domain[flow][4] # slice 
+        
         # calculate nash bargaining solution
         bw, _ = Profit_NBS.maximize_nbs(assist_flow_bw, sum_bw, assist_flow_profit, sum_profit, s, 10)
         print "NBS RESULT: ",flow,"" , bw, "mbps" 
@@ -743,15 +772,22 @@ class NetworkMonitor(app_manager.RyuApp):
                     else:
                         c = c - float (flow_info.flow_bw[flow] )
             print "Link C minus outside flow bw: ", c
-            # for f in self.communication.grouptable.keys(): # if flow splited, limit rate based on the rate in running in domain A. 
-            #     if f in congestedflows.keys():
-            #         # remaining bw in domain
-            #         flow_info.flow_bw[f] = self.communication.grouptable[f]["org_bw"] * self.communication.grouptable[f]["in_ratio"]
-            #         # remaining profit in domain
-            #         flow_info.flow_profit[f] = self.communication.grouptable[f]["org_profit"] * self.communication.grouptable[f]["in_ratio"]
+            
+            for f in congestedflows:
+                if flow_info.flow_times[f]["congestion_timestamp"] == None:
+                    flow_info.flow_times[f]["congestion_timestamp"] = time.time()
+                    flow_info.flow_times[f]["congestion_duration"] = 1.0
+                else:
+                    flow_info.flow_times[f]["congestion_duration"] = time.time() - flow_info.flow_times[f]["congestion_timestamp"]
+                print "cts: ", flow_info.flow_times[f]["congestion_timestamp"]
+                print "cd: ", flow_info.flow_times[f]["congestion_duration"]
+                print "id: ", flow_info.flow_times[f]["idle_duration"]
+                flow_info.flow_times[f]["run_duration"] = flow_info.flow_times[f]["congestion_duration"]+ flow_info.flow_times[f]["idle_duration"]
             
             flow_bw_profit_dict = self.build_flow_bw_profit_dict(flow_info.flow_profit,flow_info.flow_bw, congestedflows)
             alloc_result = bw_alloc.profit_maximize_with_ungivenbw_penalty( flow_bw_profit_dict, c)
+            # alloc_result = bw_alloc.profit_maximize_consider_congestion_time( flow_bw_profit_dict, flow_info.flow_times, c)
+            # alloc_result = bw_alloc.profit_proportional_with_equal_distribution( flow_bw_profit_dict, flow_info.flow_times, c)
             new_flow_bws = alloc_result["alloc"]
             print "Newly cal new_flow_bws: ",new_flow_bws
             
@@ -769,6 +805,39 @@ class NetworkMonitor(app_manager.RyuApp):
 
         except Exception as e: 
             print "Exc (process_limit_rate):", e
+
+    def process_limit_rate_by_profit_proportional(self, flow, pop_flow):
+        # metertable: key: flow(src_ip,dst_ip), 
+        #             value: a dictionary of "dpid","outport",dpid2","outport2","rate", "timestamp","meter_id","meter_id2"
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print ("[Inside process_limit_rate_by_profit_proportional][Time]%s " %timestamp)
+        try: 
+            congestedflows,dpdp = self.find_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+            c = 10.0001 # link capacity
+            flow_profits = copy.deepcopy(flow_info.flow_profit)
+            for f in self.communication.help_other_domain.keys(): # deduct outside flow bw
+                if f in congestedflows:
+                    flow_profits[f] = flow_profits[f] * 0.5
+            
+            flow_bw_profit_dict = self.build_flow_bw_profit_dict(flow_profits,flow_info.flow_bw, congestedflows)
+            alloc_result = bw_alloc.profit_proportional_alloc( flow_bw_profit_dict, c)
+            new_flow_bws = alloc_result
+            print "Newly cal new_flow_bws: ",new_flow_bws
+            
+            self.set_meter_limit(new_flow_bws,dpdp)
+
+            # if flow not in self.metertable.keys():  # have not limit rates yet, limit rate based on weight
+            #     self.set_meter_limit(new_flow_bws,dpdp)
+            #     # self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+            # else: 
+            #     diff_precent = abs(self.metertable[flow]["rate"] - new_flow_bws[flow]) / self.metertable[flow]["rate"]
+            #     if diff_precent > 0.20: # difference high enough, update rate limit
+            #         self.set_meter_limit(new_flow_bws,dpdp)
+            #         self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+            pop_flow.append(flow)
+
+        except Exception as e: 
+            print "Exc (process_limit_rate_by_profit_proportional):", e
             
 
     def find_congestedlink_flows_and_dpdp(self, flow, flow_change_table):
@@ -792,15 +861,26 @@ class NetworkMonitor(app_manager.RyuApp):
             for flow in flow_meters.keys():  
                 org_bw = flow_info.flow_bw[flow]
                 new_bw = flow_meters[flow]
-                if abs(org_bw - new_bw)/org_bw <= 0.1: # change too small, no need to limit rate
-                    continue
+                if flow in self.metertable.keys():  # change too small, no need update
+                    org_meter_bw =  self.metertable[flow]["rate"]
+                    if abs(org_meter_bw - new_bw)/org_meter_bw <= 0.1:
+                        print "flow:",flow,"org_meter_bw: ",org_meter_bw, ",new_bw:",new_bw, ", too close, skip limit rate"
+                        continue
+                else: 
+                    if abs(org_bw - new_bw)/org_bw <= 0.1: # change too small, no need to limit rate
+                        print "flow:",flow,"org_bw: ",org_bw, ",new_bw:",new_bw, ", too close, skip limit rate"
+                        flow_info.flow_times[flow]["congestion_duration"] = None # not setting it to be congested
+                        continue
+                
+
+
                 # need to limit rate, update metertable
                 self.metertable.pop(flow,None)
                 # value preparation
                 existing_ids = self.get_existing_meter_id()
                 meter_id = self.get_unique_num100(existing_ids)
                 meter_id2 = self.get_unique_num100(existing_ids+ [meter_id])
-                flow_r = (flow[1],flow[0])
+                flow_r = (flow[1],flow[0]) # reversed direction
                 in_port = self.find_inport(flow,dpdp[0])
                 #print "inport:", in_port
                 in_port2 = self.find_inport(flow_r,dpdp[1])
@@ -827,16 +907,20 @@ class NetworkMonitor(app_manager.RyuApp):
                 
                 self.add_meter_flow(self.metertable[flow]["dpid"], self.metertable[flow]["in_port"], 
                                     self.metertable[flow]["outport"], flow,self.metertable[flow]["rate"],
-                                    self.metertable[flow]["meter_id"], 15,15,1)
+                                    self.metertable[flow]["meter_id"], 15,30,1)
                 self.add_meter_flow(self.metertable[flow]["dpid2"],self.metertable[flow]["in_port2"],
                                     self.metertable[flow]["outport2"],flow_r,self.metertable[flow]["rate"],
-                                     self.metertable[flow]["meter_id2"], 15,15,1)
+                                     self.metertable[flow]["meter_id2"], 15,30,1)
                                     
         except Exception as e:
             print "Exc: ", e
                    
 
     def build_flow_bw_profit_dict(self, flow_profits, flow_bws, target_flows):
+        # prepare for limiting rate
+        # if flow has been split,  it is in self.communication.grouptable.keys
+        # deduct the part going out to the other domain.
+
         # print "build_flow_bw_profit_dict for: ", target_flows
         result = {}
         for flow in target_flows:
@@ -873,7 +957,7 @@ class NetworkMonitor(app_manager.RyuApp):
             print "new path: ", paths[best_path], "max_bw :",max_bw
             return paths[best_path],False
         
-    def add_meter_flow(self, dpid, in_port, out_port,flow, rate_mbps, meter_id=None, idle_timeout=15, hard_timeout=15, priority=1):
+    def add_meter_flow(self, dpid, in_port, out_port,flow, rate_mbps, meter_id=None, idle_timeout=15, hard_timeout=40, priority=1):
         """
         Proactively install a meter and matching flow into a switch identified by dpid.
 
@@ -901,7 +985,7 @@ class NetworkMonitor(app_manager.RyuApp):
 
             # Step 3: Send meter mod (ADD or MODIFY)
             #bands = [parser.OFPMeterBandDrop( rate = int(round(rate_mbps * 1000)), burst_size=int(round(rate_mbps*1000/2)))]
-            bands = [parser.OFPMeterBandDrop( rate = int(round(rate_mbps * 1000)), burst_size = 100)] # 100 kb
+            bands = [parser.OFPMeterBandDrop( rate = int(round(rate_mbps *1.04 * 1000)), burst_size = 100)] # 100 kb
             
             meter_mod = parser.OFPMeterMod(
                 datapath=dp,
@@ -934,7 +1018,61 @@ class NetworkMonitor(app_manager.RyuApp):
                 (meter_id, dpid, src_ip, dst_ip, out_port))
         except Exception as e:
             print "add_meter_flow Exception:" ,e
+    def add_flow(self, dpid, in_port, out_port,flow, idle_timeout=15, hard_timeout=30, priority=1):
+        """
+        Proactively add flow into a switch identified by dpid.
 
+        :param dpid: Target switch datapath ID
+        :param flow: flow[0]:src_ip ,flow[1]: dst_ip
+        :param out_port: Output port for forwarding
+        :param rate_mbps: Rate limit in Mbps
+        """
+        try:
+            src_ip, dst_ip = flow[0],flow[1]
+            # Step 1: Get datapath from Ryu registry
+            if dpid not in self.datapaths:
+                print("[In add_meter_flow] Datapath with dpid %s not connected." % dpid)
+                return
+
+            dp = self.datapaths[dpid]
+            ofp = dp.ofproto
+            parser = dp.ofproto_parser
+
+            # Step 4: Install a flow entry using this meter
+            match = parser.OFPMatch(eth_type=0x0800, ipv4_src=src_ip, ipv4_dst=dst_ip, in_port=in_port)
+            actions = [parser.OFPActionOutput(out_port)]
+            inst = [
+                parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)
+            ]
+
+            mod = parser.OFPFlowMod(
+                datapath=dp,
+                priority=priority,
+                idle_timeout=idle_timeout,
+                hard_timeout=hard_timeout,
+                match=match,
+                instructions=inst
+            )
+            dp.send_msg(mod)
+            print("[Add_Flow] Flow added to switch %s (%s -> %s, out_port %d)" %
+                (dpid, src_ip, dst_ip, out_port))
+        except Exception as e:
+            print "add_meter_flow Exception:" ,e
+
+
+    def install_flow_to_new_path(self, path, flow):
+        in_port = self.find_inport(flow,path[0])
+        try:
+            print "install_flow_to_new_path"
+            out_port = self.awareness.link_to_port[(path[0],path[1])][0]
+            self.communication.help_other_domain[(flow)][2]=path
+            self.add_flow(path[0], in_port, out_port,flow, idle_timeout=15, hard_timeout=40, priority=1)
+        except Exception as e:
+            print "Except install_flow_to_new_path: ",e
+            pass
+        
+                
+                
     def get_existing_meter_id(self):
         try: 
             existing_ids =[]
@@ -975,18 +1113,7 @@ class NetworkMonitor(app_manager.RyuApp):
 
             dp.send_msg(mod)
             self.logger.info("Sent delete command for flow %s -> %s on DPID %s" %
-                            (src_ip, dst_ip, dpid))
-
-    def update_in_out_sw(self, flow, in_sw, out_sw): # 7,14
-        # access_table = self.monitor.access_table
-        for ip,mac in self.awareness.access_table:
-            if ip == flow[0]: # in-switch update
-                self.monitor.access_table[(ip,mac)][0] = in_sw
-                self.monitor.access_table[(ip,mac)][1] = out_door[in_sw]
-            if ip == flow[1]: # out-switch update
-                self.monitor.access_table[(ip,mac)][0] = out_sw
-                self.monitor.access_table[(ip,mac)][1] = out_door[out_sw]
-                
+                            (src_ip, dst_ip, dpid))        
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def _flow_stats_reply_handler(self, ev):
@@ -1133,6 +1260,21 @@ class NetworkMonitor(app_manager.RyuApp):
             print "switch%d: port %s %s" % (dpid, reason_dict[reason], port_no)
         else:
             print "switch%d: Illeagal port state %s %s" % (port_no, reason)
+    
+    def register_flow_idle_time(self,flow,idle_duration):
+        try:
+            # idle in the sense that it is free to transmit packets, not congested.
+            if flow not in flow_info.flow_times.keys():
+                # print ("Flow not in flow info error")
+                return 0
+            if flow_info.flow_times[flow]["congestion_timestamp"] == None:
+                flow_info.flow_times[flow]["idle_duration"] = idle_duration
+            # if flow already congested, its not idle
+            # don't update timestamp
+
+        except Exception as e:
+            # print "register_flow_idle_time except: ", e
+            pass
 
     def show_stat(self, type):
         '''
@@ -1186,6 +1328,9 @@ class NetworkMonitor(app_manager.RyuApp):
                     link_host=stat.match.get('ipv4_src'),stat.match.get('ipv4_dst')
                     link_port=stat.match['in_port'],stat.instructions[-1].actions[0].port
                     self.register_load_info(link_host,dpid,link_port,stat.packet_count)
+                    # print "stat.duration_sec", stat.duration_sec, "stat.duration_nsec",stat.duration_nsec
+                    idle_duration = float( stat.duration_sec) + float( stat.duration_nsec/1000000000 )
+                    self.register_flow_idle_time(link_host,idle_duration)
 
             self.calcu_loss_rate()
             self.flag_congested_paths()
