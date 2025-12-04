@@ -1,0 +1,7 @@
+Flow,Profit,ProfitNBS_throughput,MCRM_throughput,CFM_throughput,Nothing_throughput,ProfitNBS_profit_gain,MCRM_profit_gain,CFM_profit_gain,Nothing_profit_gain,ProfitNBS_network_total_profit_gain,MCRM_network_total_profit_gain,CFM_network_total_profit_gain,Nothing_network_total_profit_gain,ProfitNBS_network_throughput,MCRM_network_throughput,CFM_network_throughput,Nothing_network_throughput
+h1->h6,88.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0
+h9->h10,88.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0
+h2->h3,56.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0
+h7->h13,48.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0
+h5->h4,20.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0
+h14->h3,9.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0,0

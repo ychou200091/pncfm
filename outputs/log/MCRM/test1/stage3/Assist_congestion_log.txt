@@ -1,0 +1,10 @@
+[Simulation Starts] Test: 1, case3, Mode: MCRM
+[Flow_start] Time: 2025-07-19 12:30:12, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 90.0, duration: 230
+[Flow_start] Time: 2025-07-19 12:30:22, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-19 12:30:33, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25.0, duration: 220
+[Flow_start] Time: 2025-07-19 12:30:58, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 64.0, duration: 180
+[Simulation Starts] Test: 1, case3, Mode: MCRM
+[Flow_start] Time: 2025-07-19 19:14:34, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 72.0, duration: 230
+[Flow_start] Time: 2025-07-19 19:14:44, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-19 19:14:54, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 10.0, duration: 220
+[Flow_start] Time: 2025-07-19 19:15:20, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 35.0, duration: 180

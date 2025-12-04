@@ -1,0 +1,15 @@
+[Simulation Starts] Test: 1, case1, Mode: PNCFM
+[Flow_start] Time: 2025-07-19 11:18:13, flow: ('10.0.0.4', '10.0.0.2'), bw: 9, profit: 25, duration: 200
+[Flow_start] Time: 2025-07-19 11:18:23, flow: ('10.0.0.10', '10.0.0.12'), bw: 3, profit: 40, duration: 150
+[Flow_start] Time: 2025-07-19 11:18:38, flow: ('10.0.0.3', '10.0.0.1'), bw: 9, profit: 50, duration: 215
+[Flow_start] Time: 2025-07-19 11:18:53, flow: ('10.0.0.9', '10.0.0.8'), bw: 7, profit: 15, duration: 200
+[Simulation Starts] Test: 1, case1, Mode: PNCFM
+[Flow_start] Time: 2025-07-19 15:04:53, flow: ('10.0.0.4', '10.0.0.2'), bw: 9, profit: 25, duration: 200
+[Flow_start] Time: 2025-07-19 15:05:03, flow: ('10.0.0.10', '10.0.0.12'), bw: 3, profit: 40, duration: 150
+[Flow_start] Time: 2025-07-19 15:05:18, flow: ('10.0.0.3', '10.0.0.1'), bw: 9, profit: 50, duration: 215
+[Flow_start] Time: 2025-07-19 15:05:33, flow: ('10.0.0.9', '10.0.0.8'), bw: 7, profit: 15, duration: 200
+[Simulation Starts] Test: 1, case1, Mode: PNCFM
+[Flow_start] Time: 2025-07-20 15:55:01, flow: ('10.0.0.4', '10.0.0.2'), bw: 9, profit: 63.0, duration: 200
+[Flow_start] Time: 2025-07-20 15:55:12, flow: ('10.0.0.10', '10.0.0.12'), bw: 3, profit: 30.0, duration: 150
+[Flow_start] Time: 2025-07-20 15:55:27, flow: ('10.0.0.3', '10.0.0.1'), bw: 9, profit: 18.0, duration: 215
+[Flow_start] Time: 2025-07-20 15:55:42, flow: ('10.0.0.9', '10.0.0.8'), bw: 7, profit: 21.0, duration: 200

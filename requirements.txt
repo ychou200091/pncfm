@@ -1,0 +1,19 @@
+# PNCFM Project Dependencies
+
+# Core SDN Controller Framework
+ryu==4.34
+
+# Network Simulation
+mininet==2.3.0
+
+# Networking and Protocol Handling
+networkx==2.6.3
+scapy==2.4.5
+
+# Data Processing and Analysis
+numpy==1.21.6
+pandas==1.3.5
+
+# Utilities
+pyyaml==6.0
+click==8.0.4

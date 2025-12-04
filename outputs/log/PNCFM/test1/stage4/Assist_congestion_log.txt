@@ -1,0 +1,488 @@
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-12 19:58:28, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-12 19:58:43, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-12 19:59:03, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 30, duration: 210
+[Flow_start] Time: 2025-07-12 19:59:48, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Flow_start] Time: 2025-07-12 20:00:18, flow: ('10.0.0.5', '10.0.0.4'), bw: 4, profit: 70, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-12 23:19:15, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-12 23:19:30, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-12 23:19:50, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-12 23:20:36, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Flow_start] Time: 2025-07-12 23:21:06, flow: ('10.0.0.5', '10.0.0.4'), bw: 4, profit: 80, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-12 23:26:23, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-12 23:26:38, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-12 23:26:58, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-12 23:27:43, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-12 23:27:57, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.000003, org_profit: 100, slice: 0.3
+[Flow_start] Time: 2025-07-12 23:28:13, flow: ('10.0.0.5', '10.0.0.4'), bw: 4, profit: 80, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-12 23:46:01, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-12 23:46:16, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-12 23:46:36, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-12 23:47:21, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-12 23:47:30, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.000003, org_profit: 100, slice: 0.3
+[Flow_start] Time: 2025-07-12 23:47:51, flow: ('10.0.0.5', '10.0.0.4'), bw: 4, profit: 80, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-13 00:18:43, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-13 00:18:58, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-13 00:19:18, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-13 00:20:04, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-13 00:20:08, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.000003, org_profit: 100, slice: 0.3
+[Flow_start] Time: 2025-07-13 00:20:34, flow: ('10.0.0.5', '10.0.0.4'), bw: 4, profit: 80, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 11:57:03, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-14 11:57:18, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 11:57:38, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-14 11:58:23, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 11:58:38, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.000003, org_profit: 100, slice: 0.3
+[Flow_start] Time: 2025-07-14 11:58:53, flow: ('10.0.0.5', '10.0.0.4'), bw: 4, profit: 80, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 14:31:45, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-14 14:32:00, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 14:32:06, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-14 14:32:26, flow: ('10.0.0.7', '10.0.0.13'), bw: 8, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 14:32:37, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.000003, org_profit: 100, slice: 0.3
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 14:35:03, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-14 14:35:18, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 14:35:23, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-14 14:35:44, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 14:35:54, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 3.999999, org_profit: 100, slice: 0.3
+[Flow_start] Time: 2025-07-14 14:37:49, flow: ('10.0.0.5', '10.0.0.4'), bw: 8, profit: 100, duration: 135
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 14:42:43, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-14 14:42:58, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 14:43:03, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-14 14:43:23, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 14:44:41, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 100, duration: 230
+[Flow_start] Time: 2025-07-14 14:44:56, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 14:45:01, flow: ('10.0.0.2', '10.0.0.3'), bw: 5, profit: 25, duration: 210
+[Flow_start] Time: 2025-07-14 14:45:21, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 14:45:33, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 3.999999, org_profit: 100, slice: 0.3
+[Flow_start] Time: 2025-07-14 14:47:26, flow: ('10.0.0.5', '10.0.0.4'), bw: 8, profit: 100, duration: 80
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 15:10:37, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-14 15:10:52, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 15:10:57, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 80, duration: 210
+[Flow_start] Time: 2025-07-14 15:11:17, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 15:11:29, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.0, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-14 15:13:22, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 30, duration: 80
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 15:46:01, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-14 15:46:16, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 90, duration: 230
+[Flow_start] Time: 2025-07-14 15:46:21, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 80, duration: 210
+[Flow_start] Time: 2025-07-14 15:46:41, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 15:46:55, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.0, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-14 15:47:37, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 30, duration: 140
+[Flow_start] Time: 2025-07-14 15:48:57, flow: ('10.0.0.14', '10.0.0.15'), bw: 2, profit: 40, duration: 70
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 16:15:35, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-14 16:15:50, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 80, duration: 230
+[Flow_start] Time: 2025-07-14 16:15:55, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 80, duration: 210
+[Flow_start] Time: 2025-07-14 16:16:15, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 16:16:18, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.0, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-14 16:17:10, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 60, duration: 140
+[Flow_start] Time: 2025-07-14 16:17:50, flow: ('10.0.0.14', '10.0.0.15'), bw: 3, profit: 40, duration: 70
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 17:48:30, flow: ('10.0.0.1', '10.0.0.6'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-14 17:48:45, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 80, duration: 230
+[Flow_start] Time: 2025-07-14 17:48:50, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 80, duration: 210
+[Flow_start] Time: 2025-07-14 17:49:10, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 17:49:22, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.0, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-14 17:50:06, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 140
+[Flow_start] Time: 2025-07-14 17:50:46, flow: ('10.0.0.14', '10.0.0.15'), bw: 3, profit: 40, duration: 70
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-14 18:22:49, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-14 18:23:04, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-14 18:23:09, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 80, duration: 210
+[Flow_start] Time: 2025-07-14 18:23:29, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-14 18:23:43, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-14 18:24:24, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 140
+[Flow_start] Time: 2025-07-14 18:25:04, flow: ('10.0.0.14', '10.0.0.15'), bw: 4, profit: 70, duration: 70
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 00:37:54, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 00:38:09, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 00:38:15, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 220
+[Flow_start] Time: 2025-07-15 00:38:35, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 180
+[Congestion_Notify]Time: 2025-07-15 00:38:52, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 00:39:10, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 160
+[Flow_start] Time: 2025-07-15 00:39:55, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 110
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 01:02:43, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 01:02:58, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 01:03:03, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 01:03:23, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 01:03:36, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 01:05:08, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 01:05:28, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 01:17:45, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 01:18:00, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 01:18:05, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 01:18:25, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 01:18:40, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 01:20:11, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 01:20:31, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 15:23:28, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:23:43, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:23:48, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 15:24:08, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 15:24:25, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 15:25:54, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 15:26:14, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 15:32:35, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:32:50, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:32:55, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 15:33:15, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 15:33:24, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 15:35:00, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 15:35:21, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 15:39:40, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:39:55, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:40:01, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 15:40:21, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 15:40:32, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 15:42:06, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 15:42:26, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 15:46:13, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:46:28, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:46:33, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 15:46:53, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 15:47:03, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 15:52:29, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:52:44, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:52:49, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 15:53:10, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 15:53:21, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 15:54:55, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 15:55:15, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-15 15:57:26, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:57:41, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-15 15:57:46, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-15 15:58:06, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-15 15:58:18, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-15 15:59:51, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-15 16:00:11, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 12:00:24, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 12:00:39, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 12:00:44, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 12:01:04, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 12:01:16, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 12:02:49, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 12:03:09, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 12:13:48, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 12:14:03, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 12:14:08, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 30, duration: 210
+[Flow_start] Time: 2025-07-16 12:14:29, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 60, duration: 150
+[Congestion_Notify]Time: 2025-07-16 12:14:32, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.0, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 12:16:14, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 12:16:34, flow: ('10.0.0.14', '10.0.0.15'), bw: 4, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 14:21:56, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:22:11, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:22:16, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 14:22:36, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 14:22:53, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 14:24:22, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 14:24:42, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 14:34:34, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 14:35:53, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:36:08, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:36:13, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 14:36:34, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 14:36:48, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 14:38:19, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 14:38:39, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 14:51:47, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:52:02, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:52:07, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 14:52:27, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 14:52:43, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 14:55:19, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:55:34, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 14:55:39, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 14:55:59, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 14:56:08, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 14:57:44, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 14:58:04, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 15:03:33, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 15:03:48, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 15:03:53, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 15:04:13, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 15:04:22, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 15:05:59, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 15:06:19, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 16:34:10, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 16:34:25, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 16:34:30, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 16:34:50, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 150
+[Congestion_Notify]Time: 2025-07-16 16:34:53, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 16:36:36, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 100
+[Flow_start] Time: 2025-07-16 16:36:56, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 65
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 16:51:20, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 16:51:35, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 16:51:40, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 220
+[Flow_start] Time: 2025-07-16 16:52:35, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 160
+[Congestion_Notify]Time: 2025-07-16 16:52:49, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000003, org_profit: 120, slice: 0.3
+[Flow_start] Time: 2025-07-16 16:53:05, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 130
+[Flow_start] Time: 2025-07-16 16:53:25, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 17:15:31, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 70, duration: 230
+[Flow_start] Time: 2025-07-16 17:15:46, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 120, duration: 230
+[Flow_start] Time: 2025-07-16 17:15:51, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 220
+[Flow_start] Time: 2025-07-16 17:16:46, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 55, duration: 160
+[Congestion_Notify]Time: 2025-07-16 17:16:55, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 70, slice: 0.3
+[Flow_start] Time: 2025-07-16 17:17:17, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 10, duration: 130
+[Flow_start] Time: 2025-07-16 17:17:37, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 90, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 21:59:06, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 21:59:21, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 21:59:26, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 18.0, duration: 220
+[Flow_start] Time: 2025-07-16 22:00:21, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 22:00:35, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 22:00:52, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 22:01:12, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 35.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 22:20:01, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 22:20:16, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 22:20:21, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 18.0, duration: 220
+[Flow_start] Time: 2025-07-16 22:21:17, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 22:21:25, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 22:21:47, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 22:22:07, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 35.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 22:30:00, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 22:30:15, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 22:30:20, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 22:31:15, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 22:31:18, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 22:31:45, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 22:32:05, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 35.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 22:37:50, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 22:38:05, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 22:38:10, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 22:39:06, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 22:39:15, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 22:39:36, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 22:39:56, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 35.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 23:05:24, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:05:39, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:05:44, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 23:06:40, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 23:06:48, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 23:07:10, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 23:07:30, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 35.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 23:21:03, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:21:18, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:21:23, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 23:22:18, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Flow_start] Time: 2025-07-16 23:22:48, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 23:23:08, flow: ('10.0.0.14', '10.0.0.15'), bw: 4, profit: 28.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 23:30:22, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:30:37, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:30:42, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 23:31:38, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 23:31:43, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 23:32:08, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 23:32:28, flow: ('10.0.0.14', '10.0.0.15'), bw: 4, profit: 28.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 23:41:35, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 64.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:41:50, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 63.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:41:55, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 23:42:50, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 23:43:00, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000002, org_profit: 64, slice: 0.3
+[Flow_start] Time: 2025-07-16 23:43:20, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 23:43:41, flow: ('10.0.0.14', '10.0.0.3'), bw: 4, profit: 28.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 23:53:30, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:53:45, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-16 23:53:50, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-16 23:54:46, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-16 23:54:54, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-16 23:55:16, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-16 23:55:36, flow: ('10.0.0.14', '10.0.0.3'), bw: 4, profit: 28.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 00:13:01, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 00:13:16, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 00:13:21, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 00:14:17, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-17 00:14:20, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 00:14:47, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-17 00:15:07, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 00:30:20, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 00:30:25, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 00:30:30, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 00:30:35, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 160
+[Congestion_Notify]Time: 2025-07-17 00:30:39, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 00:30:45, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 130
+[Flow_start] Time: 2025-07-17 00:30:55, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 115
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 00:35:10, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 00:35:15, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 00:35:20, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 00:35:25, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 00:35:34, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 00:35:35, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 00:35:45, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 01:36:30, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 01:36:35, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 01:36:40, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 01:36:45, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 01:36:50, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 01:36:55, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 01:37:05, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 01:43:28, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 01:43:33, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 01:43:38, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 01:43:43, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 01:43:49, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 01:43:54, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 01:44:04, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 01:55:34, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 01:55:39, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 01:55:44, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 01:55:49, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 01:55:53, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 01:55:59, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 01:56:09, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 14:55:36, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 14:55:41, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 14:55:46, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 14:55:51, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Flow_start] Time: 2025-07-17 14:56:01, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 14:56:11, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 15:08:18, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:08:23, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:08:28, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 15:08:33, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 15:08:38, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 15:08:43, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 15:08:53, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 15:23:45, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:23:50, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:23:55, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 15:24:00, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:24:10, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Congestion_Notify]Time: 2025-07-17 15:24:12, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 15:24:20, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 15:29:38, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:29:43, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:29:48, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 15:29:53, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 15:29:59, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 15:30:03, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 15:30:13, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 15:51:26, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:51:31, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 15:51:36, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 15:51:42, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 15:51:47, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 15:51:52, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 15:52:02, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 16:00:10, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 16:00:15, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 16:00:20, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 16:00:25, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Flow_start] Time: 2025-07-17 16:00:35, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 16:00:45, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-17 16:05:58, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-17 16:06:03, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-17 16:06:08, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-17 16:06:13, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-17 16:06:17, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-17 16:06:23, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-17 16:06:33, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-18 14:36:54, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-18 14:36:59, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-18 14:37:04, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-18 14:37:09, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-18 14:37:14, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 3.999997, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-18 14:37:19, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-18 14:37:29, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-18 14:45:33, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-18 14:45:38, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-18 14:45:43, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-18 14:45:48, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 36.0, duration: 230
+[Congestion_Notify]Time: 2025-07-18 14:45:53, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-18 14:45:58, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-18 14:46:08, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-21 14:36:00, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:36:05, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:36:10, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-21 14:36:15, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 42.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:36:25, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-21 14:36:35, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-21 14:48:25, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:48:30, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:48:35, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-21 14:48:40, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 42.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:48:50, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-21 14:49:00, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-21 14:54:39, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:54:44, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:54:49, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-21 14:54:54, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 42.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:55:04, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-21 14:55:14, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-21 14:58:18, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 32.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:58:23, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-21 14:58:28, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-21 14:58:38, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 42.0, duration: 230
+[Congestion_Notify]Time: 2025-07-21 14:58:45, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 3.000001, org_profit: 32, slice: 0.3
+[Flow_start] Time: 2025-07-21 14:58:48, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-21 14:58:53, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-21 15:18:28, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 56.0, duration: 230
+[Flow_start] Time: 2025-07-21 15:18:33, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-21 15:18:38, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-21 15:18:48, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 49.0, duration: 230
+[Congestion_Notify]Time: 2025-07-21 15:18:56, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.999999, org_profit: 56, slice: 0.3
+[Flow_start] Time: 2025-07-21 15:18:58, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-21 15:19:03, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210
+[Simulation Starts] Test: 1, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-21 16:04:19, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 56.0, duration: 230
+[Flow_start] Time: 2025-07-21 16:04:24, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-21 16:04:29, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 12.0, duration: 220
+[Flow_start] Time: 2025-07-21 16:04:39, flow: ('10.0.0.7', '10.0.0.13'), bw: 7, profit: 49.0, duration: 230
+[Congestion_Notify]Time: 2025-07-21 16:04:44, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 2.999999, org_profit: 56, slice: 0.3
+[Flow_start] Time: 2025-07-21 16:04:49, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 6.0, duration: 215
+[Flow_start] Time: 2025-07-21 16:04:54, flow: ('10.0.0.14', '10.0.0.3'), bw: 5, profit: 50.0, duration: 210

@@ -1,0 +1,7 @@
+[Simulation Starts] Test: 2, case4, Mode: Nothing
+[Flow_start] Time: 2025-07-16 13:59:23, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 51, duration: 230
+[Flow_start] Time: 2025-07-16 13:59:38, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 50, duration: 230
+[Flow_start] Time: 2025-07-16 13:59:43, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 14:00:03, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 50, duration: 150
+[Flow_start] Time: 2025-07-16 14:01:49, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 50, duration: 100
+[Flow_start] Time: 2025-07-16 14:02:09, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 50, duration: 65

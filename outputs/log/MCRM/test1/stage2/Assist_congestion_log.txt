@@ -1,0 +1,56 @@
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-19 11:48:09, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-19 11:48:14, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-19 11:48:24, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 60.0, duration: 230
+[Flow_start] Time: 2025-07-19 11:48:44, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-19 11:48:44, flow: ('10.0.0.14', '10.0.0.3'), bw: 2, profit: 10.0, duration: 210
+[Flow_start] Time: 2025-07-19 11:49:14, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-19 12:05:56, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 27.0, duration: 230
+[Flow_start] Time: 2025-07-19 12:06:01, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-19 12:06:11, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 60.0, duration: 230
+[Flow_start] Time: 2025-07-19 12:06:31, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-19 12:06:31, flow: ('10.0.0.14', '10.0.0.3'), bw: 2, profit: 10.0, duration: 210
+[Flow_start] Time: 2025-07-19 12:07:01, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-21 18:58:11, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-21 18:58:16, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-21 18:58:26, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 60.0, duration: 230
+[Flow_start] Time: 2025-07-21 18:58:46, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-21 18:58:56, flow: ('10.0.0.14', '10.0.0.3'), bw: 3, profit: 21.0, duration: 210
+[Flow_start] Time: 2025-07-21 18:59:16, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-21 19:31:42, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-21 19:31:47, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-21 19:31:57, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 60.0, duration: 230
+[Flow_start] Time: 2025-07-21 19:32:17, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-21 19:32:27, flow: ('10.0.0.14', '10.0.0.3'), bw: 3, profit: 21.0, duration: 210
+[Flow_start] Time: 2025-07-21 19:32:47, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-21 22:50:06, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-21 22:50:11, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-21 22:50:21, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 60.0, duration: 230
+[Flow_start] Time: 2025-07-21 22:50:41, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-21 22:50:51, flow: ('10.0.0.14', '10.0.0.3'), bw: 3, profit: 9.0, duration: 210
+[Flow_start] Time: 2025-07-21 22:51:11, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-21 23:01:28, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-21 23:01:33, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-21 23:01:43, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 60.0, duration: 230
+[Flow_start] Time: 2025-07-21 23:02:03, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-21 23:02:13, flow: ('10.0.0.14', '10.0.0.3'), bw: 3, profit: 9.0, duration: 210
+[Flow_start] Time: 2025-07-21 23:02:33, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-21 23:11:52, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-21 23:11:57, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-21 23:12:07, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 24.0, duration: 230
+[Flow_start] Time: 2025-07-21 23:12:27, flow: ('10.0.0.2', '10.0.0.3'), bw: 8, profit: 16.0, duration: 200
+[Flow_start] Time: 2025-07-21 23:12:37, flow: ('10.0.0.14', '10.0.0.3'), bw: 3, profit: 30.0, duration: 210
+[Flow_start] Time: 2025-07-21 23:12:57, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175
+[Simulation Starts] Test: 1, case2, Mode: MCRM
+[Flow_start] Time: 2025-07-21 23:55:52, flow: ('10.0.0.7', '10.0.0.8'), bw: 9, profit: 45.0, duration: 230
+[Flow_start] Time: 2025-07-21 23:55:57, flow: ('10.0.0.10', '10.0.0.9'), bw: 9, profit: 18.0, duration: 235
+[Flow_start] Time: 2025-07-21 23:56:07, flow: ('10.0.0.5', '10.0.0.6'), bw: 6, profit: 24.0, duration: 230
+[Flow_start] Time: 2025-07-21 23:56:27, flow: ('10.0.0.2', '10.0.0.3'), bw: 7, profit: 14.0, duration: 200
+[Flow_start] Time: 2025-07-21 23:56:37, flow: ('10.0.0.14', '10.0.0.3'), bw: 3, profit: 30.0, duration: 210
+[Flow_start] Time: 2025-07-21 23:56:58, flow: ('10.0.0.4', '10.0.0.12'), bw: 3, profit: 9.0, duration: 175

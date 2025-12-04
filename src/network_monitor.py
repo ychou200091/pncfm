@@ -1,0 +1,1431 @@
+# Copyright (C) 2016 Li Cheng at Beijing University of Posts
+# and Telecommunications. www.muzixing.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import division
+import copy
+from operator import attrgetter
+from ryu import cfg
+from ryu.base import app_manager
+from ryu.base.app_manager import lookup_service_brick
+from ryu.controller import ofp_event
+from ryu.controller.handler import MAIN_DISPATCHER, DEAD_DISPATCHER
+from ryu.controller.handler import CONFIG_DISPATCHER
+from ryu.controller.handler import set_ev_cls
+from ryu.ofproto import ofproto_v1_3, ofproto_v1_3_parser
+from ryu.lib import hub
+from ryu.lib.packet import packet
+import setting
+import random
+from numpy import array
+import time
+import flow_info
+import bw_alloc
+import pncfm
+import copy
+
+CONF = cfg.CONF
+# host_loc={(5,4),(6,4),(11,5),(12,3),(7,3),(7,4),(8,4),(6,3),(9,3),(11,4),(10,4),(9,4)}
+# out_door={13:2,4:4,14:1,7:3,14:1,}
+# ip_out_door={'10.0.0.3':4,'10.0.0.4':4,'10.0.0.1':13,'10.0.0.2':13,'10.0.0.6':4,'10.0.0.5':13 }
+
+out_door={13:2,7:3,  4:4,14:1,
+          11:4,16:2, 18:2, 9:4, 
+          6:3, 17:1
+               }
+
+ip_out_door={'10.0.0.3':4,'10.0.0.4':4,'10.0.0.1':13,'10.0.0.2':13,'10.0.0.6':4,
+          '10.0.0.5':13, '10.0.0.11':11 ,'10.0.0.12':17, 
+          '10.0.0.7':6,'10.0.0.10':18,  '10.0.0.14':13,'10.0.0.15':4, 
+          }
+
+CURRENT_MODE = flow_info.CURRENT_MODE # 0:PNCFM, 1:MCRM, 2: CFM
+ip_domain = flow_info.ip_domain
+
+switch_domain={6633:1,6634:2,6635:3}
+class NetworkMonitor(app_manager.RyuApp):
+    """
+        NetworkMonitor is a Ryu app for collecting traffic information.
+    """
+    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
+
+    def __init__(self, *args, **kwargs):
+        super(NetworkMonitor, self).__init__(*args, **kwargs)
+        self.name = 'monitor'
+        self.datapaths = {}
+        self.port_stats = {}
+        self.port_speed = {}
+        self.flow_stats = {}
+        self.flow_speed = {}
+        self.stats = {}
+        self.port_features = {}
+        self.free_bandwidth = {}
+        self.awareness = lookup_service_brick('awareness')
+        self.communication = lookup_service_brick('Communication')
+        self.graph = None
+        self.capabilities = None
+        self.best_paths = None
+        self.pre_load_table = {} 
+        self.load_diff_table = {}
+        self.freeload_table = {}
+        self.to_calculate = {}
+        self.link_load_table = {}
+        self.flow_change_table = {}
+        self.warning_flow_table = {}
+        self.load_loss_table ={}
+        # Start to green thread to monitor traffic and calculating
+        # free bandwidth of links respectively.
+        self.monitor_thread = hub.spawn(self._monitor)
+        self.save_freebandwidth_thread = hub.spawn(self._save_bw_graph)
+        self.metertable = {} # metertable: key is flow(src_ip,dst_ip), value is a dictionary of "dpid","outport","rate", "timestamp", "meter_id"
+        self.metertable2 = {} # metertable: key is flow(src_ip,dst_ip), value is a dictionary of "dpid","outport","rate", "timestamp", "meters"
+        
+        # metertable2["meters"] is a dict or meters, with keys of 
+        # metertable2["meters"][(dpid,outport)]["rate"]
+        # metertable2["meters"][(dpid,outport)]["timestamp"]
+	
+   # detects when a swtich connect or disconnect to the controller
+    @set_ev_cls(ofp_event.EventOFPStateChange,
+                [MAIN_DISPATCHER, DEAD_DISPATCHER])
+    def _state_change_handler(self, ev):
+        """
+            Record datapath's info
+        """
+        datapath = ev.datapath
+        if ev.state == MAIN_DISPATCHER: # running switch
+            if not datapath.id in self.datapaths:
+                self.logger.debug('register datapath: %016x', datapath.id)
+                self.datapaths[datapath.id] = datapath
+        elif ev.state == DEAD_DISPATCHER: # dead switch removed from self.datapaths.
+            if datapath.id in self.datapaths:
+                self.logger.debug('unregister datapath: %016x', datapath.id)
+                del self.datapaths[datapath.id]
+
+    def _monitor(self):
+        """
+            Main entry method of monitoring traffic.
+        """
+        while CONF.weight == 'hop':
+            self.stats['flow'] = {}
+            self.stats['port'] = {}
+            for dp in self.datapaths.values():
+                self.port_features.setdefault(dp.id, {})
+                self._request_stats(dp)
+                # refresh data.
+                self.capabilities = None
+                self.best_paths = None
+            hub.sleep(setting.MONITOR_PERIOD)
+            if self.stats['flow'] or self.stats['port']:
+                self.show_stat('port')
+                self.show_stat('flow')
+                
+                hub.sleep(1)
+
+    def _save_bw_graph(self):
+        """
+            Save bandwidth data into networkx graph object.
+        """
+        while CONF.weight == 'hop':
+            self.graph = self.create_bw_graph(self.free_bandwidth)
+            self.logger.debug("save_freebandwidth")
+            hub.sleep(setting.MONITOR_PERIOD)
+
+    def sortedDictValues(self,adict): 
+        keys = adict.keys() 
+        keys.sort() 
+        return map(adict.get, keys) 
+
+    def _request_stats(self, datapath):
+        """
+            Sending request msg to datapath
+        """
+        self.logger.debug('send stats request: %016x', datapath.id)
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        req = parser.OFPPortDescStatsRequest(datapath, 0)
+        datapath.send_msg(req)
+
+        req = parser.OFPPortStatsRequest(datapath, 0, ofproto.OFPP_ANY)
+        datapath.send_msg(req)
+
+        req = parser.OFPFlowStatsRequest(datapath)
+        datapath.send_msg(req)
+
+    def get_min_bw_of_links(self, graph, path, min_bw):
+        """
+            Getting bandwidth of path. Actually, the mininum bandwidth
+            of links is the bandwith, because it is the neck bottle of path.
+        """
+        _len = len(path)
+        if _len > 1:
+            minimal_band_width = min_bw
+            for i in xrange(_len-1):
+                pre, curr = path[i], path[i+1]
+                if 'bandwidth' in graph[pre][curr]:
+                    bw = graph[pre][curr]['bandwidth']
+                    minimal_band_width = min(bw, minimal_band_width)
+		    
+                else:
+                    continue
+            return minimal_band_width
+        return min_bw
+
+    def get_best_path_by_bw(self, graph, paths):
+        """
+            Get best path by comparing paths.
+            1st find paths with smallest number of hops.
+            2nd find paths with largest available bandwidth
+        """
+        capabilities = {}
+        best_paths = copy.deepcopy(paths)
+        for src in paths:
+            for dst in paths[src]:
+                if src == dst:
+                    best_paths[src][src]['bw'] = [src]
+                    capabilities.setdefault(src, {src: setting.MAX_CAPACITY})
+                    capabilities[src][src] = setting.MAX_CAPACITY
+                    continue
+                max_bw_of_paths = 0
+                best_path = paths[src][dst]['hop'][0]
+                for path in paths[src][dst]['hop']:
+                    min_bw = setting.MAX_CAPACITY
+                    min_bw = self.get_min_bw_of_links(graph, path, min_bw)
+                    if min_bw > max_bw_of_paths:
+                        max_bw_of_paths = min_bw
+                        best_path = path
+
+                best_paths[src][dst]['bw'] = best_path
+                capabilities.setdefault(src, {dst: max_bw_of_paths})
+                capabilities[src][dst] = max_bw_of_paths
+        self.capabilities = capabilities
+        self.best_paths = best_paths
+        return capabilities, best_paths
+    
+    def find_inport(self, flow, cur_sw):
+        '''
+        # given a flow(src_ip, dst_ip), find  in_port of cur_sw which is on the path of the flow.
+        # case 1: previous device is host: use access table to find in_port for cur_sw.
+        # case 2: previous device is sw: use dpdp relation to find in_port for cur_sw.
+        '''
+        access_table = self.awareness.access_table
+        src_sw = self.awareness.get_host_location(flow[0])[0]
+        dst_sw = self.awareness.get_host_location(flow[1])[0]
+        #print "[Find In_port] src_sw",src_sw, ",dst_sw",dst_sw
+        if src_sw == cur_sw:  # case 1
+            #print "[Find In_port] src_sw == cur_sw"
+            
+            for ip,mac in access_table:
+                sw,in_port = access_table[(ip,mac)]
+                # print ("src_ip %s, ip %s,mac %s, sw %s, in_port %s" %(flow[0] ,ip, mac,sw,in_port))
+                if ip == flow[0] and access_table[(ip,mac)][0] == src_sw: # src_ip match, host_sw match
+                    return access_table[(ip,mac)][1] 
+        else:  # case 2
+            pre_sw = self.get_possible_previous_sw( src_sw, dst_sw ,cur_sw)
+            #print "[Find In_port] pre_sw:",pre_sw, "cur_sw:" , cur_sw
+            if pre_sw != None:
+                dpdp = (pre_sw, cur_sw)
+                in_port = self.awareness.link_to_port[dpdp][1]
+                #print "dpdp:", dpdp, "port: ", self.awareness.link_to_port[dpdp]
+                return in_port
+        print "Inside find_inport: can't find in_port for flow",flow,"at sw", cur_sw
+        return None
+
+
+
+    def get_possible_previous_sw(self, src_sw, dst_sw, cur_sw):
+        ''' 
+            I want to find in port
+            given a list of paths, the list is ordered shortest to longest.
+            if current switch is in the path, the previous sw is in the list 
+            with the shortest distance with cur_sw in the path.
+            ex: 
+            Src: sw 7 Dst: sw 8
+            the list looks like 8: {'hop': [[7, 8], [7, 5, 6, 8]]}, 
+            if cur_sw is 6, its previous sw can only be 5.
+            if cur_sw is 8, its previous sw may be 7. since the system choose shortest path mostly.
+        '''
+        # src_sw = self.awareness.get_host_location(flow[0])
+        # dst_sw = self.awareness.get_host_location(flow[1])
+        paths= self.awareness.shortest_paths[src_sw][dst_sw]['hop']# switch path
+        # print "[Inside get_possible_previous_sw] cur_sw: ",cur_sw, "paths:", paths
+        for path in paths:
+            # print "path:", path
+            for i in range(len(path)):
+                if path[i] == cur_sw:
+                    # print "path found:", path,"i=",i
+                    if i-1 >= 0:
+                        return path[i-1]
+        return None
+
+    def create_bw_graph(self, bw_dict):
+        """
+            Save bandwidth data into networkx graph object.
+        """
+        try:
+            graph = self.awareness.graph
+            link_to_port = self.awareness.link_to_port
+            for link in link_to_port:
+                (src_dpid, dst_dpid) = link
+                (src_port, dst_port) = link_to_port[link]
+                if src_dpid in bw_dict and dst_dpid in bw_dict:
+                    bw_src = bw_dict[src_dpid][src_port]
+                    bw_dst = bw_dict[dst_dpid][dst_port]
+                    bandwidth = min(bw_src, bw_dst)
+
+		    
+                    # add key:value of bandwidth into graph.
+                    graph[src_dpid][dst_dpid]['bandwidth'] = bandwidth
+                else:
+                    graph[src_dpid][dst_dpid]['bandwidth'] = 0
+            return graph
+        except:
+            self.logger.info("Create bw graph exception")
+            if self.awareness is None:
+                self.awareness = lookup_service_brick('awareness')
+            return self.awareness.graph
+
+    def _save_freebandwidth(self, dpid, port_no, speed):
+        # Calculate free bandwidth of port and save it.
+        port_state = self.port_features.get(dpid).get(port_no)
+        if port_state:
+	
+            capacity = port_state[2]
+            curr_bw = self._get_free_bw(capacity, speed)
+            #print "capacity: ",capacity," speed:",speed," curr_bw: ",curr_bw
+            self.free_bandwidth[dpid].setdefault(port_no, None)
+            self.free_bandwidth[dpid][port_no] = curr_bw
+        else:
+            self.logger.info("Fail in getting port state")
+
+    def _save_stats(self, _dict, key, value, length):
+        if key not in _dict:
+            _dict[key] = []
+        _dict[key].append(value)
+
+        if len(_dict[key]) > length:
+            _dict[key].pop(0)
+
+    def _get_speed(self, now, pre, period):
+        if period:
+            return (now - pre) / (period)
+        else:
+            return 0
+
+    def _get_free_bw(self, capacity, speed):
+        # BW:Mbit/s
+        return max(capacity/10**6 - speed * 8/10**6, 0)
+
+    def _get_time(self, sec, nsec):
+        return sec + nsec / (10 ** 9)
+
+    def _get_period(self, n_sec, n_nsec, p_sec, p_nsec):
+        return self._get_time(n_sec, n_nsec) - self._get_time(p_sec, p_nsec)
+
+
+
+    def register_load_info(self,link_host,dpid,link_port,packet):
+        """
+            Register access host info into access table.
+        """
+	#if dpid==13 or dpid==14 or dpid==15 or dpid==16 or dpid==17 or dpid==18:
+	#    return	
+	#for key in host_loc:
+	 #   if dpid==key[0] and link_port[1]==key[1]:
+	  #      return
+        key=(link_host,dpid,link_port)
+	
+
+        if key in self.pre_load_table and key in self.load_diff_table:
+            diff=packet-self.pre_load_table[key]
+            if diff<0:
+                diff=0#packet
+
+	    
+            self.load_diff_table[key] =diff #round((load-self.pre_load_table[(dpid, outport)])*8/(10*1024*1024*12),2)
+            self.pre_load_table[key]=packet
+            #if dpid==2 and outport==3:
+    	    #self.freeload_table[(dpid, outport)] = 1
+
+            return
+        else:
+            self.pre_load_table.setdefault(key, None)
+            self.pre_load_table[key] = packet
+	    
+            self.load_diff_table.setdefault(key, None)
+            self.load_diff_table[key] = packet
+
+            self.sortedDictValues(self.pre_load_table)
+            self.sortedDictValues(self.load_diff_table)
+
+
+
+        if link_host not in self.load_loss_table:
+
+            self.load_loss_table.setdefault(link_host, None)
+            self.load_loss_table[link_host] = 0
+
+            '''
+	    self.freeload_table.setdefault((dpid, outport), None)
+	    #if dpid==2 and outport==3:
+		#self.freeload_table[(dpid, outport)] = 1
+	    #else:
+	    self.freeload_table[(dpid, outport)] = 0
+
+	    for key in self.awareness.link_to_port:
+	    	if (dpid==key[0] and outport==self.awareness.link_to_port[key][0] ) or  (dpid==key[1] and outport==self.awareness.link_to_port[key][1]):
+		    print "(dpid, outport):",dpid, outport,"key:",key
+		    link=key
+		    break
+
+	    if link not in self.link_load_table:
+	    	self.link_load_table.setdefault(link, None)
+	    	self.link_load_table[link] = 0
+
+	    self.to_calculate.setdefault(link, None)
+	    self.to_calculate[link] = 0
+	    '''
+            return
+
+
+    def calcu_loss_rate(self):
+        for key in  self.load_loss_table:
+            #print 'key:',key , (self.communication.help_other_domain) 
+            if (key not in self.communication.help_other_domain.keys()) and (ip_domain[key[0]]!=switch_domain[CONF.ofp_tcp_listen_port] or ip_domain[key[1]]!=switch_domain[CONF.ofp_tcp_listen_port]):
+                continue
+            send_port=self.awareness.get_host_location(key[0])
+            recv_port=self.awareness.get_host_location(key[1])
+            if key in self.communication.help_other_domain.keys():
+                send_port=(7,3) # switch 7 port # 3
+                recv_port=(14,1) # switch 14 port # 1
+            if key in self.communication.flow_gateway.keys():
+                send_port=(13,1)
+                #recv_port=(4,4)
+            send_packet=0
+            recv_packet=0
+            #print  "!network monitor.py! send_port",send_port,",recv_port",recv_port
+            for key2 in self.load_diff_table:
+                if key2[0]==key:# flow the same 
+                    print "(flow,dpid,ports)", key2,"sendp:",send_port,"recvp:", recv_port,",pkt#:",self.load_diff_table[key2]
+                    if key2[1]==send_port[0] and key2[2][0]==send_port[1]:#dpid the same and port the same
+                        if self.load_diff_table[key2]>send_packet:
+                            send_packet=self.load_diff_table[key2]
+                    if key2[1]==recv_port[0] and key2[2][1]==recv_port[1]:
+                        if self.load_diff_table[key2]>recv_packet:
+                            recv_packet=self.load_diff_table[key2]
+            if send_packet!=0:
+                
+                num = (send_packet-recv_packet)/send_packet
+                print "flow:",key,"send_packet:",send_packet,"recv_packet:",recv_packet,", PRL: ",num, '\n'
+                if num >=0:
+                    self.load_loss_table[key]= round (num,5) # positive lost rate, fifth decimal point
+                else:
+                    self.load_loss_table[key]= 0 # negative lost rate or you receive more than you sent somehow.
+            else:
+                self.load_loss_table[key]=0
+	
+    def flag_congested_paths(self):
+        '''
+        Flow packet lost rate too high,
+        document congested flows and its path/links.
+        document flows on the same path.
+        '''
+        if self.load_loss_table: 
+            for key in self.load_loss_table:
+                if self.load_loss_table[key] != 0 :
+                    print "\n[network_monitor.py] flow:",key,"loss_rate:", self.load_loss_table[key] 
+
+                if self.load_loss_table[key]>0.21 and  self.load_loss_table[key]<1.0:
+                    print "[Packet lost too high] flow:",key, "(load_loss_table key(src,dst)), loss_rate:",self.load_loss_table[key]
+                    #self.set_load_weight(key)#set flow change
+                    self.flag_links(key)
+
+    def flag_links(self,congested_flow):
+        ''' 
+        add links of congested flow to flow_change_table 
+        add all flows on congest links to flow_change table
+        congested_info ex: (('10.0.0.1', '10.0.0.3'), 1, (4, 1)) 
+        '''
+        congested_links = {}
+        
+        print "In Flagigng links, congested flow: ", congested_flow
+        
+        
+        for key in self.load_diff_table:
+            # ex: (('10.0.0.1', '10.0.0.3'), 1, (4, 1)) 
+            # key meaning: (flow, dpid, (in-port & out-port))
+            if key[0]==congested_flow:
+                print "key", key
+                
+                flow_link=key[1],key[2][1]
+                # key[1] is dpid (switch id)
+                # key[2][1] is  out-port number of the switch
+                
+                for key2 in self.awareness.link_to_port: #key2=> dpid,dpid
+                    # key2 represent 2 switches
+                    # I added many variable names for readability.
+                    flow_dpid = flow_link[0]
+                    flow_dpid_out_port = flow_link[1]
+                    
+                    link_src_dpid,link_dst_dpid = key2
+                    # print "link_src_dpid,link_dst_dpid", (link_src_dpid,link_dst_dpid)
+                    # print "flow_link:",flow_link
+
+                    link_src_out_port = self.awareness.link_to_port[key2][0]
+                    link_dst_in_port = self.awareness.link_to_port[key2][1]
+
+                    if flow_dpid != link_src_dpid: # not same sw
+                        continue
+                    if flow_dpid_out_port != link_src_out_port: # not same port
+                        continue
+                    # print "!sw_pair found: ",link_src_dpid,link_dst_dpid
+                    congested_links[flow_link]=link_src_dpid,link_dst_dpid #document congested link switch pair of congested flow
+                    # found matching src_sw, dst_sw pair
+                    if key2 in self.flow_change_table :
+                        if congested_flow in self.flow_change_table[key2]:
+                            continue # skip, flow already in flow_change_table
+                        self.flow_change_table[key2].append((key[0]))
+                    
+                    else:
+                        self.flow_change_table[key2]=list() 
+                        self.flow_change_table[key2].append((key[0]))
+                    print "On link",flow_link,",connect sw(",link_src_dpid,",",link_dst_dpid , "), add flow:",key[0], "to flow_change_table"
+        # add all flows on congest links to flow_change table
+        for congested_link in congested_links:
+            for key in self.load_diff_table:
+                if congested_link != (key[1],key[2][1]): # is flow on the same link
+                    continue
+                flow = key[0]
+                if not self.is_flow_in_flow_change_table(flow): 
+                    # add flow to flow_change_table
+                    sw_pair = congested_links[congested_link] 
+                    self.flow_change_table[sw_pair].append(flow)
+                    print "On link",congested_link,",connect sw(",sw_pair, "), add flow:",flow, "to flow_change_table"
+        print "----\n Flag links result. flow_change_table:\n\t", self.flow_change_table,"\n----"
+
+                        
+
+    def is_flow_in_flow_change_table(self,flow):
+        # flow_change_table. Key is switch pair, a tuple of (dpid, dpid)
+        # ex, key = (2,4), represents the connection between sw2-sw4
+        # value is a list of congested flows on this link.
+        # ex, value = [(10.0.0.1,10.0.0.3), (10.0.0.2,10.0.0.4)]
+
+        for sw_link,congested_flows in self.flow_change_table.iteritems(): 
+            if flow in congested_flows: # skip, flow already in flow_change_table
+               return True
+        return False
+
+    def set_load_weight(self,flow): # flag paths to flow_change_table
+        #if flow in self.communication.help_other_domain:#if change one times the dpid will leave the old rule
+        #    return
+        for key in self.load_diff_table: # packet lost = send - recv
+            # key ex: (('10.0.0.1', '10.0.0.3'), 1, (4, 1)) 
+            # key meaning: (flow, dpid, (in-port & out-port))
+            if key[0]==flow:
+                link=key[1],key[2][1]
+                # key[1] is dpid (switch id)
+                # key[2][1] is  out-port number of the switch
+                
+                # print "Link to port :",self.awareness.link_to_port # link_to_port: describe how sw are connected through port #
+                for key2 in self.awareness.link_to_port: #key2=> dpid,dpid
+                    # key2 represent 2 switches
+                    if (key[1]==key2[0] and key[2][1]==self.awareness.link_to_port[key2][0] ) :#dpid and port to find dpid dpid
+                        print "(dpid, outport):",link,"key:",key2 # dpid,port connect dpid1 and dpid2(what switches does this port on this switch link together)
+                        if key2 in self.flow_change_table :
+                            self.flow_change_table[key2].append((key[0]))
+                            
+                        else:
+                            self.flow_change_table[key2]=list() 
+                            self.flow_change_table[key2].append((key[0]))
+                        print "On link",link,", add flow",key[0], "to flow_change_table"
+
+    def select_the_warningflow(self,flow_change_list):
+        selected = None
+        tmp=list(set(flow_change_list).intersection(set(self.communication.help_other_domain.keys())))#if help other warning should selete it
+        tmp2=list(set(flow_change_list).intersection(set(self.communication.flow_gateway.keys())))#because the information on dpid will leave should omit it
+        #print "[select the warningflow] tmp: ", tmp, "\ttmp2: ", tmp2
+        print "[select the warningflow] flow_change_list: ",flow_change_list
+        # try to deal to have                                                                                             multiple flow going to different domain?
+        if tmp2:
+            return tmp2[0]
+        if tmp and len(tmp) ==1:
+            print 'tmp : ',tmp
+            return tmp[0]
+        elif tmp and len(tmp)>1:
+            # k=random.randint(0,len(tmp)-1)
+            k =random.choice(tmp)
+            return tmp[k]
+        else:
+            try:
+                highest_profit_flows = []
+                highest_profit = -1
+                for flow in flow_change_list:
+                    if flow not in flow_info.flow_profit.keys():
+                        flow_info.flow_profit[flow] = 0
+                    print "Flow:", flow, ", Profit:" , flow_info.flow_profit[flow]
+                    if flow_info.flow_profit[flow] > highest_profit:
+                        highest_profit = flow_info.flow_profit[flow]
+                        highest_profit_flows = [flow]
+                    elif flow_info.flow_profit[flow] == highest_profit:
+                        highest_profit_flows.append(flow)
+                selected = random.choice(highest_profit_flows)
+            except Exception as e:
+                print "exception: select_the_warningflow exception: ",e
+            
+            print "select the warning flow, flow: ", selected
+            return selected
+
+    def set_warning_flow(self):
+        # ===================
+        # find congested path, add select a flow to add to flow change table
+        # ===================
+        
+        for key in self.flow_change_table.keys(): 
+            if len(self.flow_change_table[key]) < 2:
+                continue
+            #only two flow in same dpid_dpid will deal
+            print "This link is congestion,the link is",key
+            if self.warning_flow_table == None:#first in is null
+                self.warning_flow_table = {}
+
+            for warning_flow in self.warning_flow_table :#if not in warning flow still select this flow
+                if warning_flow in self.flow_change_table[key]:
+                    flow=warning_flow
+                    print "still select:",flow
+                    continue
+            # flow not in warning_flow_table, select a flow
+            flow=self.select_the_warningflow(self.flow_change_table[key])
+            if flow not in self.warning_flow_table.keys():
+                self.warning_flow_table.setdefault(flow, None)
+                self.warning_flow_table[flow]=1
+                print "Add flow to warning_flow_table and set value to 1: ", flow
+
+    def deal_warning_flow(self):
+        try: 
+            pop_flow = []
+            for flow in self.warning_flow_table:
+                if CURRENT_MODE == 3: # nothing
+                    pop_flow.append(flow)
+                    continue
+                print "[deal_warning_flow]" , flow
+                if  flow in self.communication.help_other_domain.keys():
+                    # 1.deal with help other domain situation
+                    self.deal_warning_flow_help_other_domain(flow,pop_flow)
+                #elif flow not in self.communication.help_list.keys() or (flow in self.communication.help_list.keys() and time.time()>self.communication.help_list[flow][0]+self.communication.help_list[flow][1]):
+                elif flow not in self.communication.help_list.keys() :
+                
+                    # 2. help_list situation: flow is going out
+                    # Reroute to a different domain to lift congestion
+                    print "Congested Flow: ",flow, "Ask for help"
+                        
+                    self.communication.send_help(ip_out_door[flow[0]],ip_out_door[flow[1]],flow[0],flow[1],flow_info.flow_bw[flow],flow_info.flow_profit[flow], setting.SLICE)
+                    self.delete_flows_by_ip_pair(flow[0],flow[1])
+                elif (flow in self.communication.help_list.keys() and time.time() < (self.communication.help_list[flow][0]+self.communication.help_list[flow][1])):
+                    continue
+                else:
+                    # Reroute to a different domain done, still congested.
+                    # limit rate of flows on congested links.
+                    # or can't reroute to a different domain
+                    print "=======================\n"
+
+                    print "flow", flow, " in self.communication.help_list.keys()", "timeout happened, process limit rate"
+                    print "=======================\n"
+                    if CURRENT_MODE == 0:
+                        self.process_limit_rate(flow,pop_flow)
+                    elif CURRENT_MODE == 1:
+                        if flow in self.communication.grouptable.keys() : # split flow activated, don't limit rate
+                            if   self.communication.grouptable[flow]["in_ratio"] != 100:
+                                pop_flow.append(flow)
+                            continue
+                        self.process_limit_rate_by_profit_proportional(flow,pop_flow)
+                    elif CURRENT_MODE == 2: # CFM
+                        pass
+                    elif CURRENT_MODE == 3: # Nothing
+                        print "shortest_forwarding - deal warning flow - nothing"
+        except Exception as e:
+            print "deal_warning_flow exception: ", e      
+        for flow in pop_flow:
+            print "warning flow pop_flow:", flow
+            self.warning_flow_table.pop(flow,None)
+
+
+    def deal_warning_flow_help_other_domain(self,flow,pop_flow):
+
+        print( "warning_flow help other domain. Flow: ",flow)
+        try:
+            # 1. Find a diff path if available.
+            have_higher_bw = False
+            path = self.communication.help_other_domain[flow][2]
+            org_path = path
+
+            path,have_higher_bw=self.get_new_path_help(path[0],path[-1], flow_info.flow_bw[flow])
+            print "self.communication.help_other_domain[flow][3]: ",  self.communication.help_other_domain[flow][3]
+            if have_higher_bw and self.communication.help_other_domain[flow][3] < 1:
+                # assgin to a new path
+                # delete flow from switches to trigger do_help function in shortest_forwarding.py
+                print "delete_flows_by_ip_pair ", flow
+                #self.delete_flows_by_ip_pair(flow[0],flow[1])
+                self.install_flow_to_new_path(path,flow)
+                '''
+                self.communication.help_other_domain[flow][3]=self.communication.help_other_domain[flow][3]+1 # help count ++
+                self.communication.help_other_domain[flow][2]=path
+                self.warning_flow_table.pop(flow)
+                print("Change help path:[org_path] ", org_path, " -->[New Path] ",path)
+                '''
+            else:
+                # 2. Diff path not available. limit rate 
+                print("not have_higher_bw, flow: ",flow)
+                
+                if CURRENT_MODE == 0: # 0:PNCFM, 1:MCRM, 2: CFM      
+                    self.nbs_bw_share(flow,pop_flow)
+                    self.process_limit_rate(flow,pop_flow)   
+                elif CURRENT_MODE == 1: # MCRM
+                    if flow in self.metertable.keys():
+                        old_meter = self.metertable[flow]["rate"]
+                    else:
+                        old_meter = flow_info.flow_bw[flow]
+                    self.process_limit_rate_by_profit_proportional(flow,pop_flow)
+                    if flow in self.metertable.keys():
+                        new_meter = self.metertable[flow]["rate"]
+                    else:
+                        new_meter = flow_info.flow_bw[flow]
+                    if abs(new_meter/old_meter - 1) > 0.1:
+                        self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+                elif CURRENT_MODE == 2: # CFM
+                    pass
+                elif CURRENT_MODE == 3: # Nothing
+                    print "shortest_forwarding - deal _help_other_domain - nothing"
+
+        except Exception as e:
+            print "Exception:" , e
+    
+    
+    def nbs_bw_share(self,flow,pop_flow): 
+        # find flows on the same path
+        congestedflows,dpdp = self.find_most_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+        # calculate total profit and bw without outside flows
+        sum_profit = 0
+        sum_bw = 0
+        for f in congestedflows:
+            if f == flow: # 
+                continue
+            sum_bw = sum_bw + flow_info.flow_bw[f]
+            sum_profit = sum_profit + flow_info.flow_profit[f]
+        # print("sum_bw %d,sum_profit %d "%(sum_bw,sum_profit))
+        s = self.communication.help_other_domain[flow][4] # slice 
+        assist_flow_bw = flow_info.flow_bw[flow]
+        assist_flow_profit = flow_info.flow_profit[flow]
+        
+        # calculate nash bargaining solution
+        bw, _ = pncfm.maximize_nbs(assist_flow_bw, sum_bw, assist_flow_profit, sum_profit, s, 10)
+        print "NBS RESULT: ",flow,"" , bw, "mbps" 
+        if flow in self.metertable.keys():
+            print "NBS: update metertable & send congestion"
+            if abs( (self.metertable[flow]["rate"] - bw) /self.metertable[flow]["rate"] ) > 0.10:
+                self.set_meter_limit({flow: bw},dpdp)
+                self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+        else:
+            print "NBS: add metertable & send congestion"
+            self.set_meter_limit({flow: bw},dpdp)
+            self.communication.send_congestion(flow[0],flow[1],help_bw=self.metertable[flow]["rate"])
+            
+        pop_flow.append(flow)# remove flow from warning flows
+
+
+    def process_limit_rate(self, flow, pop_flow):
+        # metertable: key: flow(src_ip,dst_ip), 
+        #             value: a dictionary of "dpid","outport",dpid2","outport2","rate", "timestamp","meter_id","meter_id2"
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print ("[Inside process_limit_rate][Time]%s " %timestamp)
+        try:
+            #congestedflows,dpdp = self.find_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+            
+            # key: dp-dp, value: flows
+            congest_dp_flow_dict = self.find_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+            for dpdp,congestedflows in  congest_dp_flow_dict.iteritems():
+                if len(congestedflows) < 2:
+                    continue
+                c = 10.0001 # link capacity
+                for f in self.communication.help_other_domain.keys(): # deduct outside flow bw
+                    if f in congestedflows:
+                        congestedflows.remove(f)
+                        if f in self.metertable.keys():
+                            c = c - float(  self.metertable[f]["rate"] )
+                        else:
+                            c = c - float (flow_info.flow_bw[flow] )
+                print "Link C minus outside flow bw: ", c
+                
+                for f in congestedflows:
+                    if flow_info.flow_times[f]["congestion_timestamp"] == None:
+                        flow_info.flow_times[f]["congestion_timestamp"] = time.time()
+                        flow_info.flow_times[f]["congestion_duration"] = 1.0
+                    else:
+                        flow_info.flow_times[f]["congestion_duration"] = time.time() - flow_info.flow_times[f]["congestion_timestamp"]
+                    print "cts: ", flow_info.flow_times[f]["congestion_timestamp"]
+                    print "cd: ", flow_info.flow_times[f]["congestion_duration"]
+                    print "id: ", flow_info.flow_times[f]["idle_duration"]
+                    flow_info.flow_times[f]["run_duration"] = flow_info.flow_times[f]["congestion_duration"]+ flow_info.flow_times[f]["idle_duration"]
+                
+                flow_bw_profit_dict = self.build_flow_bw_profit_dict(flow_info.flow_profit,flow_info.flow_bw, congestedflows)
+                alloc_result = bw_alloc.profit_maximize_with_ungivenbw_penalty( flow_bw_profit_dict, c)
+                new_flow_bws = alloc_result["alloc"]
+                print "Newly cal new_flow_bws: ",new_flow_bws
+                
+                self.set_meter_limit(new_flow_bws,dpdp)
+                pop_flow.append(flow)
+
+        except Exception as e: 
+            print "Exc (process_limit_rate):", e
+
+    def process_limit_rate_by_profit_proportional(self, flow, pop_flow):
+        # metertable: key: flow(src_ip,dst_ip), 
+        #             value: a dictionary of "dpid","outport",dpid2","outport2","rate", "timestamp","meter_id","meter_id2"
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print ("[Inside process_limit_rate_by_profit_proportional][Time]%s " %timestamp)
+        try: 
+            congestedflows,dpdp = self.find_most_congestedlink_flows_and_dpdp(flow, self.flow_change_table)
+            c = 10.0001 # link capacity
+            flow_profits = copy.deepcopy(flow_info.flow_profit)
+            for f in self.communication.help_other_domain.keys(): # deduct outside flow bw
+                if f in congestedflows:
+                    flow_profits[f] = flow_profits[f] * 0.5
+            
+            flow_bw_profit_dict = self.build_flow_bw_profit_dict(flow_profits,flow_info.flow_bw, congestedflows)
+            alloc_result = bw_alloc.profit_proportional_alloc( flow_bw_profit_dict, c)
+            new_flow_bws = alloc_result
+            print "Newly cal new_flow_bws: ",new_flow_bws
+            
+            self.set_meter_limit(new_flow_bws,dpdp)
+
+            pop_flow.append(flow)
+
+        except Exception as e: 
+            print "Exc (process_limit_rate_by_profit_proportional):", e
+            
+    def find_congestedlink_flows_and_dpdp(self, flow, flow_change_table):
+        # find congest link flows and switch pair, aka link
+        congest_dp_flow_dict = {}
+        for key in flow_change_table.keys():
+            if flow in flow_change_table[key]:
+                congest_dp_flow_dict[key] = flow_change_table[key]
+        return congest_dp_flow_dict
+    
+    def find_most_congestedlink_flows_and_dpdp(self, flow, flow_change_table):
+        # Find the link (dp-dp) with most flows including the given flow
+        target_dpdp = None
+        count = -1
+        for dpdp in flow_change_table.keys():
+            
+            if flow in flow_change_table[dpdp]:
+                if len(flow_change_table[dpdp])> count:
+                    count = len(flow_change_table[dpdp])
+                    target_dpdp = dpdp
+
+        print "target_dpdp: ",target_dpdp, "flows: ", flow_change_table[target_dpdp]
+        return   flow_change_table[target_dpdp],target_dpdp 
+    
+    def set_meter_limit2(self, flow_meters, dpdp): # use metering by dp
+        print( "In set_meter_limit" )
+        print( "flow_meters:", flow_meters,"dpdp:", dpdp)
+        try: 
+            
+            for flow in flow_meters.keys():  
+                org_bw = flow_info.flow_bw[flow]
+                new_bw = flow_meters[flow]
+                flow_r = (flow[1],flow[0]) # reversed direction
+                in_port = self.find_inport(flow,dpdp[0])
+                in_port2 = self.find_inport(flow_r,dpdp[1])
+
+                # check if meter limit already set on this dpdp pair
+
+                if flow in self.metertable.keys():  # change too small, no need update
+                    org_meter_bw =  self.metertable[flow][(dpdp[0],in_port)]["rate"]
+                    if abs(org_meter_bw - new_bw)/org_meter_bw <= 0.1:
+                        print "flow:",flow,"org_meter_bw: ",org_meter_bw, ",new_bw:",new_bw, ", too close, skip limit rate"
+                        continue
+                else: 
+                    if abs(org_bw - new_bw)/org_bw <= 0.1: # change too small, no need to limit rate
+                        print "flow:",flow,"org_bw: ",org_bw, ",new_bw:",new_bw, ", too close, skip limit rate"
+                        flow_info.flow_times[flow]["congestion_duration"] = None # not setting it to be congested
+                        continue
+            
+                # need to limit rate, update metertable
+                self.metertable.pop(flow,None)
+                # value preparation
+                existing_ids = self.get_existing_meter_id()
+                meter_id = self.get_unique_num100(existing_ids)
+                meter_id2 = self.get_unique_num100(existing_ids+ [meter_id])
+                flow_r = (flow[1],flow[0]) # reversed direction
+                in_port = self.find_inport(flow,dpdp[0])
+                #print "inport:", in_port
+                in_port2 = self.find_inport(flow_r,dpdp[1])
+                #print "inport2:", in_port2
+                self.metertable[flow] = {}
+                # add flow to meter table for both direction
+                self.metertable[flow]["dpid"]= dpdp[0]
+                self.metertable[flow]["outport"] = self.awareness.link_to_port[dpdp][0]
+                self.metertable[flow]["dpid2"]= dpdp[1] # reversed direction limit rate
+                self.metertable[flow]["outport2"] = self.awareness.link_to_port[dpdp][1]
+                self.metertable[flow]["rate"]= round( flow_meters[flow] , 6)
+                self.metertable[flow]["timestamp"] = time.time()
+                self.metertable[flow]['meter_id'] = meter_id
+                self.metertable[flow]['meter_id2'] = meter_id2
+                self.metertable[flow]['in_port'] = in_port
+                self.metertable[flow]['in_port2'] = in_port2
+                
+
+                print "[MeteringINFO] Flow:", flow, "Profit:",flow_info.flow_profit[flow] 
+                print "\t","dp-outp",(self.metertable[flow]["dpid"],self.metertable[flow]["outport"])  
+                print "\t","reversed dp-outp", (self.metertable[flow]["dpid2"],self.metertable[flow]["outport2"]) ,"RateLimit:",self.metertable[flow]["rate"] 
+                print "\t","meter_id:",meter_id,"meter_id2:",meter_id2, "in_port",in_port,"in_port2", in_port2
+                print(" Add meter at time: ", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                
+                self.add_meter_flow(self.metertable[flow]["dpid"], self.metertable[flow]["in_port"], 
+                                    self.metertable[flow]["outport"], flow,self.metertable[flow]["rate"],
+                                    self.metertable[flow]["meter_id"], 15,30,1)
+                self.add_meter_flow(self.metertable[flow]["dpid2"],self.metertable[flow]["in_port2"],
+                                    self.metertable[flow]["outport2"],flow_r,self.metertable[flow]["rate"],
+                                     self.metertable[flow]["meter_id2"], 15,30,1)
+                                    
+        except Exception as e:
+            print "Exc: ", e
+            
+    def set_meter_limit(self, flow_meters, dpdp):
+        print( "In set_meter_limit" )
+        print( "flow_meters:", flow_meters,"dpdp:", dpdp)
+        try: 
+            for flow in flow_meters.keys():  
+                org_bw = flow_info.flow_bw[flow]
+                new_bw = flow_meters[flow]
+                if flow in self.metertable.keys():  # change too small, no need update
+                    org_meter_bw =  self.metertable[flow]["rate"]
+                    if abs(org_meter_bw - new_bw)/org_meter_bw <= 0.1:
+                        print "flow:",flow,"org_meter_bw: ",org_meter_bw, ",new_bw:",new_bw, ", too close, skip limit rate"
+                        continue
+                    if org_meter_bw < new_bw:
+                        continue
+                else: 
+                    if abs(org_bw - new_bw)/org_bw <= 0.1: # change too small, no need to limit rate
+                        print "flow:",flow,"org_bw: ",org_bw, ",new_bw:",new_bw, ", too close, skip limit rate"
+                        flow_info.flow_times[flow]["congestion_duration"] = None # not setting it to be congested
+                        continue
+                
+
+                # need to limit rate, update metertable
+                self.metertable.pop(flow,None)
+                # value preparation
+                existing_ids = self.get_existing_meter_id()
+                meter_id = self.get_unique_num100(existing_ids)
+                meter_id2 = self.get_unique_num100(existing_ids+ [meter_id])
+                flow_r = (flow[1],flow[0]) # reversed direction
+                in_port = self.find_inport(flow,dpdp[0])
+                #print "inport:", in_port
+                in_port2 = self.find_inport(flow_r,dpdp[1])
+                #print "inport2:", in_port2
+                self.metertable[flow] = {}
+                # add flow to meter table for both direction
+                self.metertable[flow]["dpid"]= dpdp[0]
+                self.metertable[flow]["outport"] = self.awareness.link_to_port[dpdp][0]
+                self.metertable[flow]["dpid2"]= dpdp[1] # reversed direction limit rate
+                self.metertable[flow]["outport2"] = self.awareness.link_to_port[dpdp][1]
+                self.metertable[flow]["rate"]= round( flow_meters[flow] , 6)
+                self.metertable[flow]["timestamp"] = time.time()
+                self.metertable[flow]['meter_id'] = meter_id
+                self.metertable[flow]['meter_id2'] = meter_id2
+                self.metertable[flow]['in_port'] = in_port
+                self.metertable[flow]['in_port2'] = in_port2
+                
+
+                print "[MeteringINFO] Flow:", flow, "Profit:",flow_info.flow_profit[flow] 
+                print "\t","dp-outp",(self.metertable[flow]["dpid"],self.metertable[flow]["outport"])  
+                print "\t","reversed dp-outp", (self.metertable[flow]["dpid2"],self.metertable[flow]["outport2"]) ,"RateLimit:",self.metertable[flow]["rate"] 
+                print "\t","meter_id:",meter_id,"meter_id2:",meter_id2, "in_port",in_port,"in_port2", in_port2
+                print(" Add meter at time: ", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                
+                self.add_meter_flow(self.metertable[flow]["dpid"], self.metertable[flow]["in_port"], 
+                                    self.metertable[flow]["outport"], flow,self.metertable[flow]["rate"],
+                                    self.metertable[flow]["meter_id"], 15,30,1)
+                self.add_meter_flow(self.metertable[flow]["dpid2"],self.metertable[flow]["in_port2"],
+                                    self.metertable[flow]["outport2"],flow_r,self.metertable[flow]["rate"],
+                                     self.metertable[flow]["meter_id2"], 15,30,1)
+                                    
+        except Exception as e:
+            print "Exc: ", e
+                   
+
+    def build_flow_bw_profit_dict(self, flow_profits, flow_bws, target_flows):
+        # prepare for limiting rate
+        # if flow has been split,  it is in self.communication.grouptable.keys
+        # deduct the part going out to the other domain.
+
+        # print "build_flow_bw_profit_dict for: ", target_flows
+        result = {}
+        for flow in target_flows:
+            bw = flow_bws[flow]
+            profit = flow_profits[flow]
+            if flow in self.communication.grouptable.keys(): # split flow, only limit rate to the amount still in domain.
+                # remaining bw in domain
+                bw = round (self.communication.grouptable[flow]["org_bw"] * self.communication.grouptable[flow]["in_ratio"] /100 , 6)
+                # remaining profit in domain
+                profit = round ( self.communication.grouptable[flow]["org_profit"] * self.communication.grouptable[flow]["in_ratio"] /100 , 6)
+                # print("Flow: ",flow, ",bw:", bw, ",profit:",profit )
+            result[flow] = { "bw":bw, "profit": profit}
+            # print("build_flow_bw_profit_dict reuslt: ", result)
+        return result
+
+    def get_new_path_help(self,in_switch,out_switch,leatest_bw):
+        shortest_paths = self.awareness.shortest_paths
+        graph = self.graph
+        paths= shortest_paths[in_switch][out_switch]['hop']# switch path
+        
+        best_path=None
+        max_bw=0
+        path_bw=0
+        for i in range(len(paths)):
+            path_bw=self.get_min_bw_of_links(graph,paths[i],setting.MAX_CAPACITY)
+            print "path: ",paths[i]," bw= ",path_bw
+            if  path_bw>max_bw:#by hop
+                max_bw=path_bw
+                best_path=i
+        if max_bw>leatest_bw:
+            print "max_bw :",max_bw, "new path: ", paths[best_path]
+            return paths[best_path],True
+        else:
+            print "new path: ", paths[best_path], "max_bw :",max_bw
+            return paths[best_path],False
+        
+    def add_meter_flow(self, dpid, in_port, out_port,flow, rate_mbps, meter_id=None, idle_timeout=15, hard_timeout=40, priority=1):
+        """
+        Proactively install a meter and matching flow into a switch identified by dpid.
+
+        :param dpid: Target switch datapath ID
+        :param flow: flow[0]:src_ip ,flow[1]: dst_ip
+        :param out_port: Output port for forwarding
+        :param rate_mbps: Rate limit in Mbps
+        :param meter_id: Optional specific meter ID, otherwise auto-generate
+        """
+        try:
+            src_ip, dst_ip = flow[0],flow[1]
+            # Step 1: Get datapath from Ryu registry
+            if dpid not in self.datapaths:
+                print("[In add_meter_flow] Datapath with dpid %s not connected." % dpid)
+                return
+
+            dp = self.datapaths[dpid]
+            ofp = dp.ofproto
+            parser = dp.ofproto_parser
+
+            # Step 2: Allocate a meter ID if not provided
+            if meter_id is None:
+                existing_ids = self.get_existing_meter_id()
+                meter_id = self.get_unique_num100(existing_ids)
+
+            # Step 3: Send meter mod (ADD or MODIFY)
+            #bands = [parser.OFPMeterBandDrop( rate = int(round(rate_mbps * 1000)), burst_size=int(round(rate_mbps*1000/2)))]
+            bands = [parser.OFPMeterBandDrop( rate = int(round(rate_mbps *1.04 * 1000)), burst_size = 100)] # 100 kb
+            
+            meter_mod = parser.OFPMeterMod(
+                datapath=dp,
+                command=ofp.OFPMC_ADD,
+                flags=ofp.OFPMF_KBPS,
+                meter_id=meter_id,
+                bands=bands
+            )
+            dp.send_msg(meter_mod)
+            print("[MeterMod] Sent to switch %s: meter_id=%d, rate=%.3f Mbps" % (dpid, meter_id, rate_mbps))
+
+            # Step 4: Install a flow entry using this meter
+            match = parser.OFPMatch(eth_type=0x0800, ipv4_src=src_ip, ipv4_dst=dst_ip, in_port=in_port)
+            actions = [parser.OFPActionOutput(out_port)]
+            inst = [
+                parser.OFPInstructionMeter(meter_id, ofp.OFPIT_METER),
+                parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)
+            ]
+
+            mod = parser.OFPFlowMod(
+                datapath=dp,
+                priority=priority,
+                idle_timeout=idle_timeout,
+                hard_timeout=hard_timeout,
+                match=match,
+                instructions=inst
+            )
+            dp.send_msg(mod)
+            print("[FlowMod] Flow added with meter %d to switch %s (%s -> %s, out_port %d)" %
+                (meter_id, dpid, src_ip, dst_ip, out_port))
+        except Exception as e:
+            print "add_meter_flow Exception:" ,e
+    def add_flow(self, dpid, in_port, out_port,flow, idle_timeout=15, hard_timeout=30, priority=1):
+        """
+        Proactively add flow into a switch identified by dpid.
+
+        :param dpid: Target switch datapath ID
+        :param flow: flow[0]:src_ip ,flow[1]: dst_ip
+        :param out_port: Output port for forwarding
+        :param rate_mbps: Rate limit in Mbps
+        """
+        try:
+            src_ip, dst_ip = flow[0],flow[1]
+            # Step 1: Get datapath from Ryu registry
+            if dpid not in self.datapaths:
+                print("[In add_meter_flow] Datapath with dpid %s not connected." % dpid)
+                return
+
+            dp = self.datapaths[dpid]
+            ofp = dp.ofproto
+            parser = dp.ofproto_parser
+
+            # Step 4: Install a flow entry using this meter
+            match = parser.OFPMatch(eth_type=0x0800, ipv4_src=src_ip, ipv4_dst=dst_ip, in_port=in_port)
+            actions = [parser.OFPActionOutput(out_port)]
+            inst = [
+                parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)
+            ]
+
+            mod = parser.OFPFlowMod(
+                datapath=dp,
+                priority=priority,
+                idle_timeout=idle_timeout,
+                hard_timeout=hard_timeout,
+                match=match,
+                instructions=inst
+            )
+            dp.send_msg(mod)
+            print("[Add_Flow] Flow added to switch %s (%s -> %s, out_port %d)" %
+                (dpid, src_ip, dst_ip, out_port))
+        except Exception as e:
+            print "add_meter_flow Exception:" ,e
+
+
+    def install_flow_to_new_path(self, path, flow):
+        in_port = self.find_inport(flow,path[0])
+        try:
+            print "install_flow_to_new_path"
+            out_port = self.awareness.link_to_port[(path[0],path[1])][0]
+            self.communication.help_other_domain[(flow)][2]=path
+            self.add_flow(path[0], in_port, out_port,flow, idle_timeout=15, hard_timeout=40, priority=1)
+        except Exception as e:
+            print "Except install_flow_to_new_path: ",e
+            pass
+        
+                
+                
+    def get_existing_meter_id(self):
+        try: 
+            existing_ids =[]
+            existing_ids.extend([v["meter_id"] for v in self.metertable.values() if "meter_id" in v])
+            existing_ids.extend([v["meter_id2"] for v in self.metertable.values() if "meter_id2" in v])
+            print "Existing Meter_id: ", existing_ids
+        except Exception as e:
+            print "Except:" ,e
+        return existing_ids
+    def get_unique_num100(self,ids) :
+        mid = random.randint(0,100)
+        if(len(ids) == 0):
+            return mid
+        while  mid in ids:
+            mid = random.randint(0,100)
+        return mid
+
+    def delete_flows_by_ip_pair(self, src_ip, dst_ip):
+        for dpid in self.datapaths:
+            dp = self.datapaths[dpid]
+            ofproto = dp.ofproto
+            parser = dp.ofproto_parser
+
+            match = parser.OFPMatch(
+                eth_type=0x0800,  # IPv4
+                ipv4_src=src_ip,
+                ipv4_dst=dst_ip
+            )
+
+            mod = parser.OFPFlowMod(
+                datapath=dp,
+                command=ofproto.OFPFC_DELETE,
+                out_port=ofproto.OFPP_ANY,
+                out_group=ofproto.OFPG_ANY,
+                match=match,
+                priority=1  # Adjust priority if necessary
+            )
+
+            dp.send_msg(mod)
+            self.logger.info("Sent delete command for flow %s -> %s on DPID %s" %
+                            (src_ip, dst_ip, dpid))        
+
+    @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
+    def _flow_stats_reply_handler(self, ev):
+        """
+            Save flow stats reply info into self.flow_stats.
+            Calculate flow speed and Save it.
+        """
+        body = ev.msg.body
+        dpid = ev.msg.datapath.id
+        self.stats['flow'][dpid] = body
+        self.flow_stats.setdefault(dpid, {})
+        self.flow_speed.setdefault(dpid, {})
+        for stat in sorted([flow for flow in body if flow.priority == 1],
+                           key=lambda flow: (flow.match.get('in_port'),
+                                             flow.match.get('ipv4_dst'))):
+            #print stat
+            #print stat.instructions[-1]
+            in_port = stat.match.get('in_port')
+            dst_ip = stat.match.get('ipv4_dst')
+            if in_port is None or dst_ip is None:
+                print "[_flow_stats_reply_handler]", stat
+                continue
+            
+            if isinstance(stat.instructions[-1].actions[0],ev.msg.datapath.ofproto_parser.OFPActionGroup):
+                continue
+
+            key = (stat.match['in_port'],  stat.match.get('ipv4_dst'),
+                   stat.instructions[-1].actions[0].port)
+            
+            value = (stat.packet_count, stat.byte_count,
+                     stat.duration_sec, stat.duration_nsec)
+            self._save_stats(self.flow_stats[dpid], key, value, 5)
+
+            # Get flow's speed.
+            pre = 0
+            period = setting.MONITOR_PERIOD
+            tmp = self.flow_stats[dpid][key]
+            if len(tmp) > 1:
+                pre = tmp[-2][1]
+                period = self._get_period(tmp[-1][2], tmp[-1][3],
+                                          tmp[-2][2], tmp[-2][3])
+
+            speed = self._get_speed(self.flow_stats[dpid][key][-1][1],
+                                    pre, period)
+            self._save_stats(self.flow_speed[dpid], key, speed, 5)
+
+    
+    @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
+    def _port_stats_reply_handler(self, ev):
+        """
+            Save port's stats info
+            Calculate port's speed and save it.
+        """
+        body = ev.msg.body
+        dpid = ev.msg.datapath.id
+        self.stats['port'][dpid] = body
+        self.free_bandwidth.setdefault(dpid, {})
+
+        for stat in sorted(body, key=attrgetter('port_no')):
+            port_no = stat.port_no
+            if port_no != ofproto_v1_3.OFPP_LOCAL:
+                key = (dpid, port_no)
+                value = (stat.tx_bytes, stat.rx_bytes, stat.rx_errors,
+                         stat.duration_sec, stat.duration_nsec)
+
+                self._save_stats(self.port_stats, key, value, 5)
+
+                # Get port speed.
+                pre = 0
+                period = setting.MONITOR_PERIOD
+                tmp = self.port_stats[key]
+                if len(tmp) > 1:
+                    pre = tmp[-2][0] + tmp[-2][1]
+                    period = self._get_period(tmp[-1][3], tmp[-1][4],
+                                              tmp[-2][3], tmp[-2][4])
+
+                speed = self._get_speed(
+                    self.port_stats[key][-1][0] + self.port_stats[key][-1][1],
+                    pre, period)
+
+                self._save_stats(self.port_speed, key, speed, 5)
+                self._save_freebandwidth(dpid, port_no, speed)
+
+    @set_ev_cls(ofp_event.EventOFPPortDescStatsReply, MAIN_DISPATCHER)
+    def port_desc_stats_reply_handler(self, ev):
+        """
+            Save port description info.
+        """
+        msg = ev.msg
+        dpid = msg.datapath.id
+        ofproto = msg.datapath.ofproto
+
+        config_dict = {ofproto.OFPPC_PORT_DOWN: "Down",
+                       ofproto.OFPPC_NO_RECV: "No Recv",
+                       ofproto.OFPPC_NO_FWD: "No Farward",
+                       ofproto.OFPPC_NO_PACKET_IN: "No Packet-in"}
+
+        state_dict = {ofproto.OFPPS_LINK_DOWN: "Down",
+                      ofproto.OFPPS_BLOCKED: "Blocked",
+                      ofproto.OFPPS_LIVE: "Live"}
+
+        ports = []
+        for p in ev.msg.body:
+            ports.append('port_no=%d hw_addr=%s name=%s config=0x%08x '
+                         'state=0x%08x curr=0x%08x advertised=0x%08x '
+                         'supported=0x%08x peer=0x%08x curr_speed=%d '
+                         'max_speed=%d' %
+                         (p.port_no, p.hw_addr,
+                          p.name, p.config,
+                          p.state, p.curr, p.advertised,
+                          p.supported, p.peer, p.curr_speed,
+                          p.max_speed))
+
+            if p.config in config_dict:
+                config = config_dict[p.config]
+            else:
+                config = "up"
+
+            if p.state in state_dict:
+                state = state_dict[p.state]
+            else:
+                state = "up"
+
+            port_feature = (config, state, p.curr_speed)
+            self.port_features[dpid][p.port_no] = port_feature
+
+    @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER)
+    def _port_status_handler(self, ev):
+        """
+            Handle the port status changed event.
+        """
+        msg = ev.msg
+        reason = msg.reason
+        port_no = msg.desc.port_no
+        dpid = msg.datapath.id
+        ofproto = msg.datapath.ofproto
+
+        reason_dict = {ofproto.OFPPR_ADD: "added",
+                       ofproto.OFPPR_DELETE: "deleted",
+                       ofproto.OFPPR_MODIFY: "modified", }
+
+        if reason in reason_dict:
+
+            print "switch%d: port %s %s" % (dpid, reason_dict[reason], port_no)
+        else:
+            print "switch%d: Illeagal port state %s %s" % (port_no, reason)
+    
+    def register_flow_idle_time(self,flow,idle_duration):
+        try:
+            # idle in the sense that it is free to transmit packets, not congested.
+            if flow not in flow_info.flow_times.keys():
+                # print ("Flow not in flow info error")
+                return 0
+            if flow_info.flow_times[flow]["congestion_timestamp"] == None:
+                flow_info.flow_times[flow]["idle_duration"] = idle_duration
+            # if flow already congested, its not idle
+            # don't update timestamp
+
+        except Exception as e:
+            # print "register_flow_idle_time except: ", e
+            pass
+
+    def show_stat(self, type):
+        '''
+            Show statistics info according to data type.
+            type: 'port' 'flow'
+        '''
+        if setting.TOSHOW is False:
+            return
+
+        #print "send help trigger count: ",self.communication.send_help_count
+        bodys = self.stats[type]
+        if(type == 'flow'):
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            print  "[Time] ", timestamp
+            print "===========Show Stat=========="
+
+            self.flow_change_table.clear()
+            self.warning_flow_table.clear() # i added
+            self.load_loss_table.clear() # i added
+            self.load_diff_table.clear() # i added
+	    
+            print('datapath         ''   in-port        ip-dst      '
+                  'out-port packets  bytes  flow-speed(B/s)')
+            print('---------------- ''  -------- ----------------- '
+                  '-------- -------- -------- -----------')
+            print_count = 0
+            for dpid in bodys.keys():
+                for stat in sorted(
+                    [flow for flow in bodys[dpid] if flow.priority == 1],
+                    key=lambda flow: (flow.match.get('in_port'),
+                                      flow.match.get('ipv4_dst'))):
+                    
+                    if print_count <5:
+                        print "stat", stat
+                        print_count += 1
+                    if isinstance(stat.instructions[-1].actions[0],self.datapaths.values()[0].ofproto_parser.OFPActionGroup):
+                        print "[Show Stat Inst]", stat
+                        continue
+                    if  stat.match.get('in_port') is None or  stat.match.get('ipv4_dst') is None:
+                        print "[Show Stat Inst]", stat
+                        continue
+
+                    print('%016d %8x %17s %8x %8d %8d %8.1f' % (
+                        dpid,
+                        stat.match['in_port'],
+                        stat.match['ipv4_dst'],
+                        stat.instructions[-1].actions[0].port,
+                        stat.packet_count, stat.byte_count,
+                        abs(self.flow_speed[dpid][(stat.match.get('in_port'),stat.match.get('ipv4_dst'),stat.instructions[-1].actions[0].port)][-1])))
+
+                    link_host=stat.match.get('ipv4_src'),stat.match.get('ipv4_dst')
+                    link_port=stat.match['in_port'],stat.instructions[-1].actions[0].port
+                    self.register_load_info(link_host,dpid,link_port,stat.packet_count)
+                    # print "stat.duration_sec", stat.duration_sec, "stat.duration_nsec",stat.duration_nsec
+                    idle_duration = float( stat.duration_sec) + float( stat.duration_nsec/1000000000 )
+                    self.register_flow_idle_time(link_host,idle_duration)
+
+            self.calcu_loss_rate()
+            self.flag_congested_paths()
+            self.set_warning_flow() # Select the right flow to reroute
+            self.deal_warning_flow()
+
+            print "=======================\n"
+            print "Load_Diff_Table: "
+            if self.load_diff_table:
+                for key2 in self.load_diff_table:
+                    print "\t", key2,": ",self.load_diff_table[key2]
+            print '-----\n'
+            
+            print "Load_Loss_Table:"
+            if self.load_loss_table:
+                for key2 in self.load_loss_table:
+                    print "\t", key2,": ",self.load_loss_table[key2]
+            print '-----\n'
+
+            print "Flow_change_table: "
+            if self.flow_change_table:
+                for key2 in self.flow_change_table:
+                    print "\t", key2,": ",self.flow_change_table[key2]
+            print '-----\n'
+
+            print "Warning_flow_table: "
+            if self.warning_flow_table:
+                for key2 in self.warning_flow_table:
+                    print "\t", key2,": ",self.warning_flow_table[key2]
+            print '-----\n'
+
+            
+            print "Metertable: "
+            if self.metertable:
+                for key2 in self.metertable:
+                    print "\t", key2,": ",self.metertable[key2]
+            print '-----\n'
+            print "=======================\n"
+            print "Monitor datapaths:"
+            print self.datapaths
+            print "Best_paths:"
+                
+            shortest_paths = self.awareness.shortest_paths
+            for src in shortest_paths:
+                print "Src: ", src, "Dst: ", shortest_paths[src]
+            print "Aware table"
+            print self.awareness.access_table
+            print "=======================\n"

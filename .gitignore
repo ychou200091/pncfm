@@ -1,27 +1,20 @@
-OVS281_modify.zip
-/code/6633
-/code/6634
-/code/6635
-/sample
-/ryu
-/OVS281_modify
-/code
-/codeM/log/CHFM/
-/codeM/log/CFM/
-/codeM/log/CHFM_org/
-/codeM/log/CFM_org/
-/codeM/log/client1_3.out
-/codeM/log/client2_4.out
-/codeM/log/client5_6.out
-/codeM/log/client9_10.out
 /codeM/ringtone.mp3
 /codeM/ringtone.wav
 /codeM/temp.py
-# git rm --cached OVS281_modify -r
-# git rm --cached /sample -r
-# git rm --cached /ryu -r
+/codeM/ryu_log*
+
+*6633*
+*6634*
+*6635*
+*.vscode
+*.pcapng
 *.awk
 *.out
-*.csv
-*.png
+*.ods
+*.pyc
+.gitignore
 
+/docs/interview_related_questions_en.md
+/docs/interview_related_questions.md
+/docs/other_notes.md
+/docs/todo.md

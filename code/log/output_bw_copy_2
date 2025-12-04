@@ -1,3 +1,0 @@
-awk -f avgStats.awk  4.out > avgTCP4.out
-awk -f avgStats.awk  7.out > avgTCP7.out
-awk -f avgStats.awk  3.out > avgTCP3.out

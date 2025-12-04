@@ -1,0 +1,15 @@
+[Simulation Starts] Test: 2, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 13:09:52, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 51, duration: 230
+[Flow_start] Time: 2025-07-16 13:10:07, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 50, duration: 230
+[Flow_start] Time: 2025-07-16 13:10:12, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 13:10:32, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 50, duration: 150
+[Flow_start] Time: 2025-07-16 13:12:17, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 50, duration: 100
+[Flow_start] Time: 2025-07-16 13:12:37, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 50, duration: 65
+[Simulation Starts] Test: 2, case4, Mode: PNCFM
+[Flow_start] Time: 2025-07-16 13:19:30, flow: ('10.0.0.1', '10.0.0.6'), bw: 8, profit: 51, duration: 230
+[Flow_start] Time: 2025-07-16 13:19:45, flow: ('10.0.0.9', '10.0.0.10'), bw: 9, profit: 50, duration: 230
+[Flow_start] Time: 2025-07-16 13:19:50, flow: ('10.0.0.2', '10.0.0.3'), bw: 6, profit: 50, duration: 210
+[Flow_start] Time: 2025-07-16 13:20:10, flow: ('10.0.0.7', '10.0.0.13'), bw: 6, profit: 50, duration: 150
+[Congestion_Notify]Time: 2025-07-16 13:20:24, flow: (u'10.0.0.1', u'10.0.0.6'), help_bw: 4.000001, org_profit: 51, slice: 0.3
+[Flow_start] Time: 2025-07-16 13:21:55, flow: ('10.0.0.5', '10.0.0.4'), bw: 3, profit: 50, duration: 100
+[Flow_start] Time: 2025-07-16 13:22:16, flow: ('10.0.0.14', '10.0.0.15'), bw: 5, profit: 50, duration: 65

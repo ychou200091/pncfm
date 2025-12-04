@@ -1,0 +1,4 @@
+Time,Transfer(MBytes),Bandwidth(Mbits/sec),Packet_Lost,Total_Packets,Min_Latency(ms),Max_Latency(ms),Avg_Latency(ms)
+0.0000,0.0000,0.0000,0,0,0.0000,0.0000,0.0000
+5.0000,0.0000,0.0000,0,0,0.0000,0.0000,0.0000
+10.0000,0.0000,0.0000,0,0,0.0000,0.0000,0.0000
